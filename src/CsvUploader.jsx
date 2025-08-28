@@ -31,7 +31,7 @@ function CsvUploader({ titolo = "Importa CSV", collezione = "CLIENTI" }) {
               comune: riga["Comune"] || "",
               referente: riga["Referente"] || riga["Contatti"] || "",
               cellulare: riga["Cellulare"] || "",
-              dataCreazione: new Date()
+              dataCreazione: new Date().toISOString() // ✅ convertita in stringa
             };
           } else if (collezione === "MEZZI") {
             return {
@@ -95,7 +95,7 @@ function CsvUploader({ titolo = "Importa CSV", collezione = "CLIENTI" }) {
               {dati.map((row, rowIndex) => (
                 <tr key={rowIndex}>
                   {intestazioni.map((col, colIndex) => (
-                    <td key={colIndex}>{row[col]}</td>
+                    <td key={colIndex}>{String(row[col])}</td> {/* ✅ conversione sicura */}
                   ))}
                 </tr>
               ))}
