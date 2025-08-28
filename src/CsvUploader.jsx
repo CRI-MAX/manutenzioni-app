@@ -18,9 +18,21 @@ function CsvUploader({ titolo = "Importa CSV", collezione = "CLIENTI" }) {
       header: true,
       skipEmptyLines: true,
       complete: function (results) {
-        setDati(results.data);
-        setIntestazioni(Object.keys(results.data[0] || {}));
-        setMessaggio(`✅ ${results.data.length} record pronti per l'importazione`);
+        const raw = results.data;
+
+        // Mappatura campo "Cliente" → "ragioneSociale"
+        const corretti = raw.map((riga) => {
+          const copia = { ...riga };
+          if (copia.Cliente && !copia.ragioneSociale) {
+            copia.ragioneSociale = copia.Cliente;
+            delete copia.Cliente;
+          }
+          return copia;
+        });
+
+        setDati(corretti);
+        setIntestazioni(Object.keys(corretti[0] || {}));
+        setMessaggio(`✅ ${corretti.length} record pronti per l'importazione`);
       },
       error: function (err) {
         console.error("Errore nel parsing:", err);
