@@ -5,6 +5,9 @@ import { db } from "./firebase";
 import Container from "react-bootstrap/Container";
 import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
+import UploadFotoMezzo from "./UploadFotoMezzo";
+import AllegatiIntervento from "./AllegatiIntervento";
+import VisualizzaAllegati from "./VisualizzaAllegati";
 
 const DettaglioMezzo = () => {
   const { mezzoId } = useParams();
@@ -15,9 +18,11 @@ const DettaglioMezzo = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const mezziSnap = await getDocs(collection(db, "MEZZI"));
-        const clientiSnap = await getDocs(collection(db, "CLIENTI"));
-        const interventiSnap = await getDocs(collection(db, "INTERVENTI"));
+        const [mezziSnap, clientiSnap, interventiSnap] = await Promise.all([
+          getDocs(collection(db, "MEZZI")),
+          getDocs(collection(db, "CLIENTI")),
+          getDocs(collection(db, "INTERVENTI"))
+        ]);
 
         const mezzi = mezziSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         const clienti = clientiSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -64,6 +69,16 @@ const DettaglioMezzo = () => {
           <h5 className="mb-3">📄 Informazioni Mezzo</h5>
           <p><strong>Modello:</strong> {mezzo.modello || "—"}</p>
           <p><strong>Cliente:</strong> {cliente?.ragioneSociale || "—"}</p>
+
+          <UploadFotoMezzo mezzoId={mezzoId} />
+          {mezzo.fotoUrl && (
+            <img
+              src={mezzo.fotoUrl}
+              alt="Foto mezzo"
+              className="img-fluid rounded mt-3 shadow-sm"
+              style={{ maxHeight: "300px", objectFit: "cover" }}
+            />
+          )}
         </Card.Body>
       </Card>
 
@@ -77,7 +92,7 @@ const DettaglioMezzo = () => {
             <th>Note</th>
             <th>Stato</th>
             <th>Prossima Scadenza</th>
-            <th>Allegato</th>
+            <th>Allegati</th>
           </tr>
         </thead>
         <tbody>
@@ -95,13 +110,8 @@ const DettaglioMezzo = () => {
                 </td>
                 <td>{formatData(int.prossimaScadenza)}</td>
                 <td>
-                  {int.allegato ? (
-                    <a href={int.allegato} target="_blank" rel="noopener noreferrer">
-                      📎 Visualizza
-                    </a>
-                  ) : (
-                    "—"
-                  )}
+                  <AllegatiIntervento interventoId={int.id} />
+                  <VisualizzaAllegati allegati={int.allegati || []} />
                 </td>
               </tr>
             ))

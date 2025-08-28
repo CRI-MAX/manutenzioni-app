@@ -13,6 +13,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import * as XLSX from "xlsx";
+import AllegatiIntervento from "./AllegatiIntervento";
+import VisualizzaAllegati from "./VisualizzaAllegati";
 
 const InterventiTable = () => {
   const [interventi, setInterventi] = useState([]);
@@ -140,6 +142,8 @@ const InterventiTable = () => {
             <th>Stato</th>
             <th>Note</th>
             <th>Azioni</th>
+            <th>Prossima Scadenza</th>
+            <th>Allegati</th>
           </tr>
         </thead>
         <tbody>
@@ -151,6 +155,11 @@ const InterventiTable = () => {
                 <td>{i.tecnico || "—"}</td>
                 <td>{i.stato || "—"}</td>
                 <td>{i.note || "—"}</td>
+                <td>{i.prossimaScadenza || "—"}</td>
+                <td>
+        <AllegatiIntervento interventoId={i.id} onAggiorna={() => {}} />
+  <VisualizzaAllegati allegati={i.allegati || []} />
+</td>
                 <td>
                   <Button variant="outline-primary" size="sm" onClick={() => apriModifica(i)}>✏️</Button>{' '}
                   <Button variant="outline-danger" size="sm" onClick={() => eliminaIntervento(i.id)}>🗑️</Button>
@@ -207,16 +216,27 @@ const InterventiTable = () => {
                 <option value="In Ritardo">In Ritardo</option>
               </Form.Select>
             </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Note</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={modifica?.note || ""}
-                onChange={(e) => setModifica({ ...modifica, note: e.target.value })}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Annull
+                    <Form.Group className="mb-2">
+          <Form.Label>Prossima Scadenza</Form.Label>
+          <Form.Control
+            type="date"
+            value={modifica?.prossimaScadenza || ""}
+            onChange={(e) => setModifica({ ...modifica, prossimaScadenza: e.target.value })}
+          />
+        </Form.Group>
+      </Form>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="secondary" onClick={() => setShowModal(false)}>
+        ❌ Annulla
+      </Button>
+      <Button variant="primary" onClick={salvaModifica}>
+        💾 Salva modifiche
+      </Button>
+    </Modal.Footer>
+  </Modal>
+</Container>
+);
+};
+
+export default InterventiTable;
