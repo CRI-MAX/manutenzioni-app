@@ -20,14 +20,19 @@ function CsvUploader({ titolo = "Importa CSV", collezione = "CLIENTI" }) {
       complete: function (results) {
         const raw = results.data;
 
-        // Mappatura campo "Cliente" → "ragioneSociale"
         const corretti = raw.map((riga) => {
-          const copia = { ...riga };
-          if (copia.Cliente && !copia.ragioneSociale) {
-            copia.ragioneSociale = copia.Cliente;
-            delete copia.Cliente;
-          }
-          return copia;
+          const cliente = {
+            ragioneSociale: riga["Cliente"] || riga["Ragione Sociale"] || riga["Nome completo"] || "—",
+            indirizzo: riga["Indirizzo"] || riga["Indirizzo esteso"] || "",
+            telefono: riga["Telefono"] || riga["Telefono 1"] || "",
+            email: riga["Email"] || riga["EMail"] || "",
+            partitaIVA: riga["Partita IVA"] || "",
+            comune: riga["Comune"] || "",
+            referente: riga["Referente"] || riga["Contatti"] || "",
+            cellulare: riga["Cellulare"] || "",
+            dataCreazione: new Date()
+          };
+          return cliente;
         });
 
         setDati(corretti);

@@ -156,9 +156,7 @@ function App() {
             />
 
             <Route path="/mezzo/:mezzoId" element={<DettaglioMezzo />} />
-
             <Route path="/report" element={<h3>📊 Sezione Report (in costruzione)</h3>} />
-
             <Route
               path="/registrazione"
               element={
@@ -167,9 +165,7 @@ function App() {
                   : <h5 className="text-danger">⛔ Solo gli admin possono registrare nuovi utenti</h5>
               }
             />
-
             <Route path="/recupero" element={<RecuperoPassword />} />
-
             <Route
               path="/utenti"
               element={
@@ -178,7 +174,6 @@ function App() {
                   : <h5 className="text-danger">⛔ Solo gli admin possono gestire gli utenti</h5>
               }
             />
-
             <Route
               path="/admin"
               element={
@@ -187,7 +182,6 @@ function App() {
                   : <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
               }
             />
-
             <Route
               path="/log"
               element={
