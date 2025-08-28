@@ -1,89 +1,72 @@
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { auth, db } from "./firebase";
-import { collection, addDoc } from "firebase/firestore";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
+import { toast } from "react-toastify";
 
-const Registrazione = () => {
+function Registrazione() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [ruolo, setRuolo] = useState("tecnico");
-  const [messaggio, setMessaggio] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [nome, setNome] = useState("");
+  const [ruolo, setRuolo] = useState("tecnico"); // default
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessaggio("");
-    setLoading(true);
-
     try {
-      const userCred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      await addDoc(collection(db, "utenti"), {
-        uid: userCred.user.uid,
-        email: email.trim(),
+      const credenziali = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = credenziali.user.uid;
+
+      await addDoc(collection(db, "UTENTI"), {
+        nome,
+        email,
         ruolo,
+        uid,
+        attivo: true,
+        dataCreazione: Timestamp.now()
       });
 
-      setMessaggio("✅ Utente registrato con successo");
-      setEmail("");
-      setPassword("");
-      setRuolo("tecnico");
-    } catch (err) {
-      console.error("Errore nella registrazione:", err);
-      setMessaggio("❌ Errore nella registrazione. Controlla i dati o riprova.");
-    } finally {
-      setLoading(false);
+      toast.success("✅ Utente registrato con successo");
+      setEmail(""); setPassword(""); setNome(""); setRuolo("tecnico");
+    } catch (error) {
+      console.error("Errore nella registrazione:", error);
+      toast.error("❌ Errore nella registrazione");
     }
   };
 
   return (
-    <Container className="mt-4" style={{ maxWidth: "400px" }}>
-      <h4 className="mb-3 text-center">👤 Registrazione nuovo utente</h4>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-2">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoFocus
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-2">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Ruolo</Form.Label>
-          <Form.Select value={ruolo} onChange={(e) => setRuolo(e.target.value)}>
-            <option value="admin">Admin</option>
-            <option value="tecnico">Tecnico</option>
-            <option value="cliente">Cliente</option>
-          </Form.Select>
-        </Form.Group>
-
-        <Button type="submit" variant="primary" disabled={loading} className="w-100">
-          {loading ? "Registrazione in corso..." : "Registra utente"}
-        </Button>
-
-        {messaggio && (
-          <div className={`mt-3 text-center ${messaggio.startsWith("❌") ? "text-danger" : "text-success"}`}>
-            {messaggio}
-          </div>
-        )}
-      </Form>
-    </Container>
+    <div className="card p-4">
+      <h3>➕ Registrazione Nuovo Utente</h3>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Nome completo"
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <select value={ruolo} onChange={(e) => setRuolo(e.target.value)}>
+          <option value="tecnico">Tecnico</option>
+          <option value="cliente">Cliente</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="submit" className="btn btn-primary mt-3">Registra</button>
+      </form>
+    </div>
   );
-};
+}
 
 export default Registrazione;

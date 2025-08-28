@@ -1,140 +1,74 @@
-import React, { useState, useEffect } from "react";
-import { collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
-import Table from "react-bootstrap/Table";
-import Container from "react-bootstrap/Container";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import * as XLSX from "xlsx";
+import { normalizzaMezzo } from "./utils/normalizza";
+import CsvExport from "./CsvExport";
 
-const MezziTable = () => {
+function MezziTable() {
   const [mezzi, setMezzi] = useState([]);
-  const [filtrati, setFiltrati] = useState([]);
-  const [query, setQuery] = useState("");
-  const [modificaMezzo, setModificaMezzo] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-
-  const fetchMezzi = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "MEZZI"));
-      const dati = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setMezzi(dati);
-      setFiltrati(dati);
-    } catch (error) {
-      console.error("Errore nel caricamento mezzi:", error);
-    }
-  };
+  const [filtro, setFiltro] = useState("");
 
   useEffect(() => {
+    const fetchMezzi = async () => {
+      const snapshot = await getDocs(collection(db, "MEZZI"));
+      const dati = snapshot.docs.map(doc => normalizzaMezzo(doc.data()));
+      setMezzi(dati);
+    };
     fetchMezzi();
   }, []);
 
-  useEffect(() => {
-    const q = query.toLowerCase();
-    const risultati = mezzi.filter(m =>
-      Object.values(m).some(val =>
-        String(val).toLowerCase().includes(q)
-      )
-    );
-    setFiltrati(risultati);
-  }, [query, mezzi]);
+  const intestazioni = [
+    { label: "Modello", key: "modello" },
+    { label: "Marca", key: "marca" },
+    { label: "Targa", key: "targa" },
+    { label: "Anno", key: "anno" },
+    { label: "Cliente ID", key: "clienteId" }
+  ];
 
-  const eliminaMezzo = async (id) => {
-    try {
-      await deleteDoc(doc(db, "MEZZI", id));
-      await fetchMezzi();
-    } catch (error) {
-      console.error("Errore nell'eliminazione:", error);
-    }
-  };
-
-  const apriModifica = (mezzo) => {
-    setModificaMezzo(mezzo);
-    setShowModal(true);
-  };
-
-  const salvaModifica = async () => {
-    try {
-      const ref = doc(db, "MEZZI", modificaMezzo.id);
-      const { id, ...dati } = modificaMezzo;
-      await updateDoc(ref, dati);
-      await fetchMezzi();
-      setShowModal(false);
-    } catch (error) {
-      console.error("Errore nella modifica:", error);
-    }
-  };
-
-  const esportaCSV = () => {
-    const righe = filtrati.map(m =>
-      `"${m.targa || ""}","${m.modello || ""}","${m.marca || ""}","${m.anno || ""}"`
-    );
-    const header = `"Targa","Modello","Marca","Anno"`;
-    const contenuto = [header, ...righe].join("\n");
-    const blob = new Blob([contenuto], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "mezzi.csv";
-    link.click();
-  };
-
-  const esportaExcel = () => {
-    const dati = filtrati.map(m => ({
-      Targa: m.targa || "",
-      Modello: m.modello || "",
-      Marca: m.marca || "",
-      Anno: m.anno || ""
-    }));
-    const ws = XLSX.utils.json_to_sheet(dati);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Mezzi");
-    XLSX.writeFile(wb, "mezzi.xlsx");
-  };
-
-  const stampaTabella = () => {
-    window.print();
-  };
+  const filtrati = mezzi.filter(m =>
+    m.modello.toLowerCase().includes(filtro.toLowerCase()) ||
+    m.targa.toLowerCase().includes(filtro.toLowerCase()) ||
+    m.clienteId.toLowerCase().includes(filtro.toLowerCase())
+  );
 
   return (
-    <Container className="mt-4">
-      <h3 className="mb-3">🚚 Elenco Mezzi</h3>
-
-      <div className="d-flex flex-wrap gap-2 mb-3">
-        <Form.Control
-          type="text"
-          placeholder="🔍 Cerca mezzo..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          style={{ maxWidth: "300px" }}
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>🚚 Elenco Mezzi</h3>
+        <CsvExport
+          dati={filtrati}
+          intestazioni={intestazioni}
+          nomeFile="mezzi.csv"
         />
-        <Button variant="success" onClick={esportaCSV}>📤 CSV</Button>
-        <Button variant="info" onClick={esportaExcel}>📊 Excel</Button>
-        <Button variant="secondary" onClick={stampaTabella}>🖨️ Stampa</Button>
       </div>
 
-      <Table striped bordered hover responsive>
+      <input
+        type="text"
+        className="form-control mb-3"
+        placeholder="🔍 Cerca per modello, targa o cliente ID..."
+        value={filtro}
+        onChange={(e) => setFiltro(e.target.value)}
+      />
+
+      <table className="table table-bordered">
         <thead>
           <tr>
-            <th>Targa</th>
             <th>Modello</th>
             <th>Marca</th>
+            <th>Targa</th>
             <th>Anno</th>
-            <th>Azioni</th>
+            <th>Cliente ID</th>
           </tr>
         </thead>
         <tbody>
           {filtrati.length > 0 ? (
-            filtrati.map((m) => (
-              <tr key={m.id}>
-                <td>{m.targa || "—"}</td>
-                <td>{m.modello || "—"}</td>
-                <td>{m.marca || "—"}</td>
-                <td>{m.anno || "—"}</td>
-                <td>
-                  <Button variant="outline-primary" size="sm" onClick={() => apriModifica(m)}>✏️</Button>{' '}
-                  <Button variant="outline-danger" size="sm" onClick={() => eliminaMezzo(m.id)}>🗑️</Button>
-                </td>
+            filtrati.map((m, i) => (
+              <tr key={i}>
+                <td>{m.modello}</td>
+                <td>{m.marca}</td>
+                <td>{m.targa}</td>
+                <td>{m.anno}</td>
+                <td>{m.clienteId}</td>
               </tr>
             ))
           ) : (
@@ -145,51 +79,9 @@ const MezziTable = () => {
             </tr>
           )}
         </tbody>
-      </Table>
-
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modifica Mezzo</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-2">
-              <Form.Label>Targa</Form.Label>
-              <Form.Control
-                value={modificaMezzo?.targa || ""}
-                onChange={(e) => setModificaMezzo({ ...modificaMezzo, targa: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Modello</Form.Label>
-              <Form.Control
-                value={modificaMezzo?.modello || ""}
-                onChange={(e) => setModificaMezzo({ ...modificaMezzo, modello: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Marca</Form.Label>
-              <Form.Control
-                value={modificaMezzo?.marca || ""}
-                onChange={(e) => setModificaMezzo({ ...modificaMezzo, marca: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Anno</Form.Label>
-              <Form.Control
-                value={modificaMezzo?.anno || ""}
-                onChange={(e) => setModificaMezzo({ ...modificaMezzo, anno: e.target.value })}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Annulla</Button>
-          <Button variant="primary" onClick={salvaModifica}>Salva</Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+      </table>
+    </div>
   );
-};
+}
 
 export default MezziTable;

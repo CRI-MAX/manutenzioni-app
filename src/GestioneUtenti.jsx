@@ -5,138 +5,167 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  addDoc,
+  Timestamp
 } from "firebase/firestore";
 import { db } from "./firebase";
-import Table from "react-bootstrap/Table";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
+import { normalizzaUtente } from "./utils/normalizza";
+import CsvExport from "./CsvExport";
+import { toast } from "react-toastify";
 
-const GestioneUtenti = () => {
+function GestioneUtenti() {
   const [utenti, setUtenti] = useState([]);
-  const [clienti, setClienti] = useState([]);
+  const [filtro, setFiltro] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [utentiSnap, clientiSnap] = await Promise.all([
-          getDocs(collection(db, "utenti")),
-          getDocs(collection(db, "clienti")),
-        ]);
-        setUtenti(utentiSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-        setClienti(clientiSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-      } catch (error) {
-        console.error("Errore nel caricamento utenti/clienti:", error);
-      }
+    const fetchUtenti = async () => {
+      const snapshot = await getDocs(collection(db, "UTENTI"));
+      const dati = snapshot.docs.map(d => ({
+        id: d.id,
+        ...normalizzaUtente(d.data())
+      }));
+      setUtenti(dati);
     };
-    fetchData();
+    fetchUtenti();
   }, []);
 
-  const aggiornaRuolo = async (id, nuovoRuolo) => {
+  const creaNotifica = async (messaggio, tipo = "info") => {
+    await addDoc(collection(db, "NOTIFICHE"), {
+      messaggio,
+      tipo,
+      utente: "admin",
+      timestamp: Timestamp.now()
+    });
+  };
+
+  const toggleAttivo = async (id, statoAttuale) => {
     try {
-      await updateDoc(doc(db, "utenti", id), { ruolo: nuovoRuolo });
-      aggiornaVista();
+      await updateDoc(doc(db, "UTENTI", id), { attivo: !statoAttuale });
+      setUtenti(prev =>
+        prev.map(u => (u.id === id ? { ...u, attivo: !statoAttuale } : u))
+      );
+      toast.success("✅ Stato aggiornato");
+      await creaNotifica(`Utente ${id} ${!statoAttuale ? "attivato" : "disattivato"}`, "info");
     } catch (error) {
-      console.error("Errore aggiornamento ruolo:", error);
+      console.error("Errore nel cambio stato:", error);
+      toast.error("❌ Errore nel cambio stato");
     }
   };
 
-  const aggiornaCliente = async (id, clienteId) => {
+  const eliminaUtente = async (id, nome) => {
+    if (!window.confirm(`Vuoi davvero eliminare l'utente "${nome}"?`)) return;
     try {
-      await updateDoc(doc(db, "utenti", id), { clienteId });
-      aggiornaVista();
+      await deleteDoc(doc(db, "UTENTI", id));
+      setUtenti(prev => prev.filter(u => u.id !== id));
+      toast.success("🗑️ Utente eliminato");
+      await creaNotifica(`Utente "${nome}" eliminato`, "warning");
     } catch (error) {
-      console.error("Errore aggiornamento cliente:", error);
+      console.error("Errore nell'eliminazione:", error);
+      toast.error("❌ Errore nell'eliminazione");
     }
   };
 
-  const eliminaUtente = async (id) => {
-    if (window.confirm("Sei sicuro di voler eliminare questo utente?")) {
-      try {
-        await deleteDoc(doc(db, "utenti", id));
-        setUtenti((prev) => prev.filter((u) => u.id !== id));
-      } catch (error) {
-        console.error("Errore eliminazione utente:", error);
-      }
+  const cambiaRuolo = async (id, nuovoRuolo) => {
+    try {
+      await updateDoc(doc(db, "UTENTI", id), { ruolo: nuovoRuolo });
+      setUtenti(prev =>
+        prev.map(u => (u.id === id ? { ...u, ruolo: nuovoRuolo } : u))
+      );
+      toast.success(`🔄 Ruolo aggiornato a "${nuovoRuolo}"`);
+      await creaNotifica(`Ruolo utente ${id} aggiornato a "${nuovoRuolo}"`, "info");
+    } catch (error) {
+      console.error("Errore nel cambio ruolo:", error);
+      toast.error("❌ Errore nel cambio ruolo");
     }
   };
 
-  const aggiornaVista = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "utenti"));
-      setUtenti(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    } catch (error) {
-      console.error("Errore aggiornamento vista:", error);
-    }
-  };
+  const intestazioni = [
+    { label: "Nome", key: "nome" },
+    { label: "Email", key: "email" },
+    { label: "Ruolo", key: "ruolo" },
+    { label: "Attivo", key: "attivo" }
+  ];
+
+  const filtrati = utenti.filter(u =>
+    u.nome.toLowerCase().includes(filtro.toLowerCase()) ||
+    u.email.toLowerCase().includes(filtro.toLowerCase()) ||
+    u.ruolo.toLowerCase().includes(filtro.toLowerCase())
+  );
 
   return (
-    <Container className="mt-4">
-      <h3 className="mb-4">👥 Gestione Utenti</h3>
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3>👤 Gestione Utenti</h3>
+        <CsvExport
+          dati={filtrati}
+          intestazioni={intestazioni}
+          nomeFile="utenti.csv"
+        />
+      </div>
 
-      <Table striped bordered hover responsive>
+      <input
+        type="text"
+        className="form-control mb-3"
+        placeholder="🔍 Cerca per nome, email o ruolo..."
+        value={filtro}
+        onChange={(e) => setFiltro(e.target.value)}
+      />
+
+      <table className="table table-bordered">
         <thead>
           <tr>
+            <th>Nome</th>
             <th>Email</th>
             <th>Ruolo</th>
-            <th>Cliente assegnato</th>
+            <th>Stato</th>
             <th>Azioni</th>
           </tr>
         </thead>
         <tbody>
-          {utenti.length > 0 ? (
-            utenti.map((u) => (
-              <tr key={u.id}>
-                <td>{u.email || "—"}</td>
+          {filtrati.length > 0 ? (
+            filtrati.map((u, i) => (
+              <tr key={i}>
+                <td>{u.nome}</td>
+                <td>{u.email}</td>
                 <td>
-                  <Form.Select
-                    value={u.ruolo || ""}
-                    onChange={(e) => aggiornaRuolo(u.id, e.target.value)}
+                  <select
+                    className="form-select form-select-sm"
+                    value={u.ruolo}
+                    onChange={(e) => cambiaRuolo(u.id, e.target.value)}
                   >
                     <option value="admin">Admin</option>
                     <option value="tecnico">Tecnico</option>
                     <option value="cliente">Cliente</option>
-                  </Form.Select>
+                  </select>
                 </td>
-                <td>
-                  {u.ruolo === "tecnico" ? (
-                    <Form.Select
-                      value={u.clienteId || ""}
-                      onChange={(e) => aggiornaCliente(u.id, e.target.value)}
-                    >
-                      <option value="">—</option>
-                      {clienti.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.ragioneSociale}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-                <td>
-                  <Button
-                    variant="outline-danger"
-                    size="sm"
-                    onClick={() => eliminaUtente(u.id)}
+                <td>{u.attivo ? "✅ Attivo" : "⛔ Disattivo"}</td>
+                <td className="d-flex gap-2">
+                  <button
+                    className="btn btn-sm btn-outline-secondary"
+                    onClick={() => toggleAttivo(u.id, u.attivo)}
+                  >
+                    {u.attivo ? "Disattiva" : "Attiva"}
+                  </button>
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => eliminaUtente(u.id, u.nome)}
                   >
                     Elimina
-                  </Button>
+                  </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="4" className="text-center text-muted">
-                Nessun utente registrato.
+              <td colSpan="5" className="text-center text-muted">
+                Nessun utente trovato.
               </td>
             </tr>
           )}
         </tbody>
-      </Table>
-    </Container>
+      </table>
+    </div>
   );
-};
+}
 
 export default GestioneUtenti;
