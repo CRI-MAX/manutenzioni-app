@@ -8,7 +8,8 @@ import Card from "react-bootstrap/Card";
 import UploadFotoMezzo from "./UploadFotoMezzo";
 import AllegatiIntervento from "./AllegatiIntervento";
 import VisualizzaAllegati from "./VisualizzaAllegati";
-import DateDisplay from "./components/DateDisplay"; // ✅ aggiunto
+import DateDisplay from "./components/DateDisplay";
+import BadgeStato from "./components/BadgeStato"; // ✅ nuovo componente
 
 const DettaglioMezzo = () => {
   const { mezzoId } = useParams();
@@ -44,15 +45,6 @@ const DettaglioMezzo = () => {
 
     fetchData();
   }, [mezzoId]);
-
-  const getBadgeColor = (stato) => {
-    switch (stato) {
-      case "Effettuato": return "success";
-      case "Programmato": return "warning";
-      case "In Ritardo": return "danger";
-      default: return "secondary";
-    }
-  };
 
   if (!mezzo) return <p className="text-muted p-3">🔄 Caricamento dettagli mezzo...</p>;
 
@@ -99,11 +91,7 @@ const DettaglioMezzo = () => {
                 <td>{int.tipo || "—"}</td>
                 <td>{int.tecnico || "—"}</td>
                 <td>{int.note || "—"}</td>
-                <td>
-                  <span className={`badge bg-${getBadgeColor(int.stato)}`}>
-                    {int.stato || "—"}
-                  </span>
-                </td>
+                <td><BadgeStato stato={int.stato} /></td>
                 <td><DateDisplay data={int.prossimaScadenza} /></td>
                 <td>
                   <AllegatiIntervento interventoId={int.id} />

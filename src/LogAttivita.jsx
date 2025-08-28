@@ -3,7 +3,7 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
-import DateDisplay from "./components/DateDisplay"; // ✅ aggiunto
+import DateDisplay from "./components/DateDisplay";
 
 const LogAttivita = () => {
   const [log, setLog] = useState([]);

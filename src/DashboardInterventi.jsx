@@ -21,16 +21,27 @@ function DashboardInterventi() {
   }, []);
 
   const conteggioStati = interventi.reduce((acc, i) => {
-    const stato = i.stato || "Non definito";
+    const stato = typeof i.stato === "string" && i.stato.trim() !== ""
+      ? i.stato.trim()
+      : "Non definito";
     acc[stato] = (acc[stato] || 0) + 1;
     return acc;
   }, {});
+
+  const coloriStato = {
+    Effettuato: "#28a745",
+    Programmato: "#ffc107",
+    "In Ritardo": "#dc3545",
+    "Non definito": "#6c757d"
+  };
 
   const data = {
     labels: Object.keys(conteggioStati),
     datasets: [{
       data: Object.values(conteggioStati),
-      backgroundColor: ["#28a745", "#ffc107", "#dc3545", "#6c757d"]
+      backgroundColor: Object.keys(conteggioStati).map(
+        stato => coloriStato[stato] || "#999"
+      )
     }]
   };
 

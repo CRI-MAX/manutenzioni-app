@@ -20,15 +20,15 @@ function NotifichePanel() {
   const fetchNotifiche = async () => {
     setCaricamento(true);
     try {
-      let baseQuery = query(collection(db, "NOTIFICHE"), orderBy("timestamp", "desc"));
       const filtri = [];
-
       if (filtroUtente.trim()) filtri.push(where("utente", "==", filtroUtente.trim()));
       if (filtroTipo) filtri.push(where("tipo", "==", filtroTipo));
 
-      const finalQuery = filtri.length > 0
-        ? query(collection(db, "NOTIFICHE"), ...filtri, orderBy("timestamp", "desc"))
-        : baseQuery;
+      const finalQuery = query(
+        collection(db, "NOTIFICHE"),
+        ...filtri,
+        orderBy("timestamp", "desc")
+      );
 
       const snapshot = await getDocs(finalQuery);
       const dati = snapshot.docs.map(doc => ({

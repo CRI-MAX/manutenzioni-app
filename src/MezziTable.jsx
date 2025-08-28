@@ -40,9 +40,9 @@ function MezziTable() {
   ];
 
   const filtrati = mezzi.filter(m =>
-    m.modello?.toLowerCase().includes(filtro.toLowerCase()) ||
-    m.targa?.toLowerCase().includes(filtro.toLowerCase()) ||
-    m.clienteId?.toLowerCase().includes(filtro.toLowerCase())
+    [m.modello, m.targa, m.clienteId]
+      .filter(Boolean)
+      .some(val => val.toLowerCase().includes(filtro.toLowerCase()))
   );
 
   const stampaTabella = () => window.print();
@@ -116,13 +116,13 @@ function MezziTable() {
         </thead>
         <tbody>
           {filtrati.length > 0 ? (
-            filtrati.map((m, i) => (
-              <tr key={i}>
-                <td>{m.modello}</td>
-                <td>{m.marca}</td>
-                <td>{m.targa}</td>
-                <td>{m.anno}</td>
-                <td>{m.clienteId}</td>
+            filtrati.map((m) => (
+              <tr key={m.id}>
+                <td>{m.modello || "—"}</td>
+                <td>{m.marca || "—"}</td>
+                <td>{m.targa || "—"}</td>
+                <td>{m.anno || "—"}</td>
+                <td>{m.clienteId || "—"}</td>
                 <td className="d-flex gap-2">
                   <button
                     className="btn btn-sm btn-outline-primary"

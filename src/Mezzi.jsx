@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-  addDoc,
-} from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from "./firebase";
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";

@@ -15,7 +15,8 @@ import Modal from "react-bootstrap/Modal";
 import * as XLSX from "xlsx";
 import AllegatiIntervento from "./AllegatiIntervento";
 import VisualizzaAllegati from "./VisualizzaAllegati";
-import DateDisplay from "./components/DateDisplay"; // ✅ aggiunto
+import DateDisplay from "./components/DateDisplay";
+import BadgeStato from "./components/BadgeStato"; // ✅ nuovo componente
 
 const InterventiTable = () => {
   const [interventi, setInterventi] = useState([]);
@@ -154,7 +155,7 @@ const InterventiTable = () => {
                 <td>{i.mezzo || "—"}</td>
                 <td><DateDisplay data={i.data} /></td>
                 <td>{i.tecnico || "—"}</td>
-                <td>{i.stato || "—"}</td>
+                <td><BadgeStato stato={i.stato} /></td>
                 <td>{i.note || "—"}</td>
                 <td><DateDisplay data={i.prossimaScadenza} /></td>
                 <td>
@@ -213,7 +214,4 @@ const InterventiTable = () => {
               >
                 <option value="">—</option>
                 <option value="Effettuato">Effettuato</option>
-                <option value="Programmato">Programmato</option>
-                <option value="In Ritardo">In Ritardo</option>
-              </Form.Select>
-            </
+                <option value="Programmato">Programmato

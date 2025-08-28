@@ -29,26 +29,27 @@ const ImportaExcel = ({ tipo }) => {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const dati = XLSX.utils.sheet_to_json(sheet);
 
-      const collezione = tipo === "clienti" ? "clienti" : "mezzi";
+      const collezione = tipo === "clienti" ? "CLIENTI" : "MEZZI";
 
       for (const item of dati) {
-        if (tipo === "clienti") {
-          await addDoc(collection(db, collezione), {
-            ragioneSociale: item.ragioneSociale || "—",
-            partitaIVA: item.partitaIVA || "—",
-            indirizzo: item.indirizzo || "—",
-            email: item.email || "—",
-            telefono: item.telefono || "—",
-            referente: item.referente || "—",
-          });
-        } else if (tipo === "mezzi") {
-          await addDoc(collection(db, collezione), {
-            marca: item.marca || "—",
-            modello: item.modello || "—",
-            matricola: item.matricola || "—",
-            clienteId: item.clienteId || "—",
-          });
-        }
+        const record =
+          tipo === "clienti"
+            ? {
+                ragioneSociale: item.ragioneSociale || "—",
+                partitaIVA: item.partitaIVA || "—",
+                indirizzo: item.indirizzo || "—",
+                email: item.email || "—",
+                telefono: item.telefono || "—",
+                referente: item.referente || "—",
+              }
+            : {
+                marca: item.marca || "—",
+                modello: item.modello || "—",
+                matricola: item.matricola || "—",
+                clienteId: item.clienteId || "—",
+              };
+
+        await addDoc(collection(db, collezione), record);
       }
 
       setMessaggio("✅ Importazione completata con successo.");

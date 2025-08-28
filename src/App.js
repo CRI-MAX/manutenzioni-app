@@ -69,10 +69,9 @@ function App() {
 
   const salvaSuFirebase = async (collezione, dati) => {
     try {
-      const normalizzati = collezione === "CLIENTI"
-        ? dati.map(normalizzaCliente)
-        : collezione === "MEZZI"
-        ? dati.map(normalizzaMezzo)
+      const normalizzati =
+        collezione === "CLIENTI" ? dati.map(normalizzaCliente)
+        : collezione === "MEZZI" ? dati.map(normalizzaMezzo)
         : dati;
 
       for (const item of normalizzati) {
@@ -117,35 +116,39 @@ function App() {
             <Route
               path="/clienti"
               element={
-                ruoloUtente === "admin"
-                  ? <>
-                      <CsvUploader
-                        titolo="Importa Clienti"
-                        onUpload={async (dati) => {
-                          await salvaSuFirebase("CLIENTI", dati);
-                          setRefresh(!refresh);
-                        }}
-                      />
-                      <ClientiTable key={refresh} />
-                    </>
-                  : <h5 className="text-danger">⛔ Accesso negato</h5>
+                ruoloUtente === "admin" ? (
+                  <>
+                    <CsvUploader
+                      titolo="Importa Clienti"
+                      onUpload={async (dati) => {
+                        await salvaSuFirebase("CLIENTI", dati);
+                        setRefresh(!refresh);
+                      }}
+                    />
+                    <ClientiTable key={refresh} />
+                  </>
+                ) : (
+                  <h5 className="text-danger">⛔ Accesso negato</h5>
+                )
               }
             />
             <Route
               path="/mezzi"
               element={
-                ["admin", "tecnico"].includes(ruoloUtente)
-                  ? <>
-                      <CsvUploader
-                        titolo="Importa Mezzi"
-                        onUpload={async (dati) => {
-                          await salvaSuFirebase("MEZZI", dati);
-                          setRefresh(!refresh);
-                        }}
-                      />
-                      <MezziTable key={refresh} />
-                    </>
-                  : <h5 className="text-danger">⛔ Accesso negato</h5>
+                ["admin", "tecnico"].includes(ruoloUtente) ? (
+                  <>
+                    <CsvUploader
+                      titolo="Importa Mezzi"
+                      onUpload={async (dati) => {
+                        await salvaSuFirebase("MEZZI", dati);
+                        setRefresh(!refresh);
+                      }}
+                    />
+                    <MezziTable key={refresh} />
+                  </>
+                ) : (
+                  <h5 className="text-danger">⛔ Accesso negato</h5>
+                )
               }
             />
             <Route path="/mezzo/:mezzoId" element={<DettaglioMezzo />} />
@@ -153,42 +156,52 @@ function App() {
             <Route
               path="/registrazione"
               element={
-                ruoloUtente === "admin"
-                  ? <Registrazione />
-                  : <h5 className="text-danger">⛔ Solo gli admin possono registrare nuovi utenti</h5>
+                ruoloUtente === "admin" ? (
+                  <Registrazione />
+                ) : (
+                  <h5 className="text-danger">⛔ Solo gli admin possono registrare nuovi utenti</h5>
+                )
               }
             />
             <Route path="/recupero" element={<RecuperoPassword />} />
             <Route
               path="/utenti"
               element={
-                ruoloUtente === "admin"
-                  ? <GestioneUtenti />
-                  : <h5 className="text-danger">⛔ Solo gli admin possono gestire gli utenti</h5>
+                ruoloUtente === "admin" ? (
+                  <GestioneUtenti />
+                ) : (
+                  <h5 className="text-danger">⛔ Solo gli admin possono gestire gli utenti</h5>
+                )
               }
             />
             <Route
               path="/dashboard-utenti"
               element={
-                ruoloUtente === "admin"
-                  ? <DashboardUtenti />
-                  : <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
+                ruoloUtente === "admin" ? (
+                  <DashboardUtenti />
+                ) : (
+                  <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
+                )
               }
             />
             <Route
               path="/admin"
               element={
-                ruoloUtente === "admin"
-                  ? <DashboardAdmin />
-                  : <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
+                ruoloUtente === "admin" ? (
+                  <DashboardAdmin />
+                ) : (
+                  <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
+                )
               }
             />
             <Route
               path="/log"
               element={
-                ruoloUtente === "admin"
-                  ? <LogAttivita />
-                  : <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
+                ruoloUtente === "admin" ? (
+                  <LogAttivita />
+                ) : (
+                  <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
+                )
               }
             />
           </Routes>

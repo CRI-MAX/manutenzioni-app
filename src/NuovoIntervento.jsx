@@ -22,7 +22,7 @@ const NuovoIntervento = ({ onInserimento }) => {
   useEffect(() => {
     const fetchMezzi = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "mezzi"));
+        const snapshot = await getDocs(collection(db, "MEZZI"));
         setMezzi(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       } catch (error) {
         console.error("Errore nel caricamento dei mezzi:", error);
@@ -36,7 +36,7 @@ const NuovoIntervento = ({ onInserimento }) => {
       const mezzo = mezzi.find(m => m.id === mezzoId);
       if (mezzo?.clienteId) {
         try {
-          const snapshot = await getDocs(collection(db, "clienti"));
+          const snapshot = await getDocs(collection(db, "CLIENTI"));
           const clienti = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           const cliente = clienti.find(c => c.id === mezzo.clienteId);
           setClienteNome(cliente?.ragioneSociale || "—");
@@ -51,7 +51,13 @@ const NuovoIntervento = ({ onInserimento }) => {
   }, [mezzoId, mezzi]);
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selected = e.target.files[0];
+    if (selected && selected.size < 10 * 1024 * 1024) {
+      setFile(selected);
+    } else {
+      alert("❌ Il file è troppo grande o non valido.");
+      setFile(null);
+    }
   };
 
   const calcolaScadenza = (data, cadenza) => {
@@ -78,7 +84,7 @@ const NuovoIntervento = ({ onInserimento }) => {
         fileURL = await getDownloadURL(snapshot.ref);
       }
 
-      await addDoc(collection(db, "interventi"), {
+      await addDoc(collection(db, "INTERVENTI"), {
         mezzoId,
         tipo,
         tecnico: tecnico.trim(),
@@ -101,6 +107,7 @@ const NuovoIntervento = ({ onInserimento }) => {
       if (onInserimento) onInserimento();
     } catch (error) {
       console.error("Errore nel salvataggio intervento:", error);
+      alert("❌ Errore nel salvataggio. Riprova.");
     } finally {
       setLoading(false);
     }
