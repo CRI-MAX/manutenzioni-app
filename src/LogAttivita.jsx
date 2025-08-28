@@ -3,6 +3,7 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
+import DateDisplay from "./components/DateDisplay"; // ✅ aggiunto
 
 const LogAttivita = () => {
   const [log, setLog] = useState([]);
@@ -25,16 +26,6 @@ const LogAttivita = () => {
     fetchLog();
   }, []);
 
-  const formatData = (timestamp) => {
-    if (!timestamp) return "—";
-    try {
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
-      return date.toLocaleString("it-IT");
-    } catch {
-      return "—";
-    }
-  };
-
   return (
     <Container className="mt-4">
       <h3 className="mb-4">📁 Registro Attività</h3>
@@ -54,7 +45,7 @@ const LogAttivita = () => {
             {log.length > 0 ? (
               log.map((entry) => (
                 <tr key={entry.id}>
-                  <td>{formatData(entry.timestamp)}</td>
+                  <td><DateDisplay data={entry.timestamp} /></td>
                   <td>{entry.email || "—"}</td>
                   <td>{entry.azione || "—"}</td>
                   <td>{entry.target || "—"}</td>

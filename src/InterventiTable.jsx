@@ -15,6 +15,7 @@ import Modal from "react-bootstrap/Modal";
 import * as XLSX from "xlsx";
 import AllegatiIntervento from "./AllegatiIntervento";
 import VisualizzaAllegati from "./VisualizzaAllegati";
+import DateDisplay from "./components/DateDisplay"; // ✅ aggiunto
 
 const InterventiTable = () => {
   const [interventi, setInterventi] = useState([]);
@@ -141,9 +142,9 @@ const InterventiTable = () => {
             <th>Tecnico</th>
             <th>Stato</th>
             <th>Note</th>
-            <th>Azioni</th>
             <th>Prossima Scadenza</th>
             <th>Allegati</th>
+            <th>Azioni</th>
           </tr>
         </thead>
         <tbody>
@@ -151,15 +152,15 @@ const InterventiTable = () => {
             filtrati.map((i) => (
               <tr key={i.id}>
                 <td>{i.mezzo || "—"}</td>
-                <td>{i.data || "—"}</td>
+                <td><DateDisplay data={i.data} /></td>
                 <td>{i.tecnico || "—"}</td>
                 <td>{i.stato || "—"}</td>
                 <td>{i.note || "—"}</td>
-                <td>{i.prossimaScadenza || "—"}</td>
+                <td><DateDisplay data={i.prossimaScadenza} /></td>
                 <td>
-        <AllegatiIntervento interventoId={i.id} onAggiorna={() => {}} />
-  <VisualizzaAllegati allegati={i.allegati || []} />
-</td>
+                  <AllegatiIntervento interventoId={i.id} onAggiorna={() => {}} />
+                  <VisualizzaAllegati allegati={i.allegati || []} />
+                </td>
                 <td>
                   <Button variant="outline-primary" size="sm" onClick={() => apriModifica(i)}>✏️</Button>{' '}
                   <Button variant="outline-danger" size="sm" onClick={() => eliminaIntervento(i.id)}>🗑️</Button>
@@ -168,7 +169,7 @@ const InterventiTable = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="text-center text-muted">
+              <td colSpan="8" className="text-center text-muted">
                 Nessun intervento trovato.
               </td>
             </tr>
@@ -215,28 +216,4 @@ const InterventiTable = () => {
                 <option value="Programmato">Programmato</option>
                 <option value="In Ritardo">In Ritardo</option>
               </Form.Select>
-            </Form.Group>
-                    <Form.Group className="mb-2">
-          <Form.Label>Prossima Scadenza</Form.Label>
-          <Form.Control
-            type="date"
-            value={modifica?.prossimaScadenza || ""}
-            onChange={(e) => setModifica({ ...modifica, prossimaScadenza: e.target.value })}
-          />
-        </Form.Group>
-      </Form>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button variant="secondary" onClick={() => setShowModal(false)}>
-        ❌ Annulla
-      </Button>
-      <Button variant="primary" onClick={salvaModifica}>
-        💾 Salva modifiche
-      </Button>
-    </Modal.Footer>
-  </Modal>
-</Container>
-);
-};
-
-export default InterventiTable;
+            </

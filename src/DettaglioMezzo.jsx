@@ -8,6 +8,7 @@ import Card from "react-bootstrap/Card";
 import UploadFotoMezzo from "./UploadFotoMezzo";
 import AllegatiIntervento from "./AllegatiIntervento";
 import VisualizzaAllegati from "./VisualizzaAllegati";
+import DateDisplay from "./components/DateDisplay"; // ✅ aggiunto
 
 const DettaglioMezzo = () => {
   const { mezzoId } = useParams();
@@ -43,11 +44,6 @@ const DettaglioMezzo = () => {
 
     fetchData();
   }, [mezzoId]);
-
-  const formatData = (timestamp) => {
-    if (!timestamp || !timestamp.toDate) return "—";
-    return timestamp.toDate().toLocaleDateString("it-IT");
-  };
 
   const getBadgeColor = (stato) => {
     switch (stato) {
@@ -99,7 +95,7 @@ const DettaglioMezzo = () => {
           {interventi.length > 0 ? (
             interventi.map((int) => (
               <tr key={int.id}>
-                <td>{formatData(int.data)}</td>
+                <td><DateDisplay data={int.data} /></td>
                 <td>{int.tipo || "—"}</td>
                 <td>{int.tecnico || "—"}</td>
                 <td>{int.note || "—"}</td>
@@ -108,7 +104,7 @@ const DettaglioMezzo = () => {
                     {int.stato || "—"}
                   </span>
                 </td>
-                <td>{formatData(int.prossimaScadenza)}</td>
+                <td><DateDisplay data={int.prossimaScadenza} /></td>
                 <td>
                   <AllegatiIntervento interventoId={int.id} />
                   <VisualizzaAllegati allegati={int.allegati || []} />
