@@ -22,7 +22,11 @@ import CsvUploader from "./CsvUploader";
 import ClientiTable from "./ClientiTable";
 import MezziTable from "./MezziTable";
 import DettaglioMezzo from "./DettaglioMezzo";
-import LogoAziendale from "./components/LogoAziendale"; // ✅ nuovo import
+import LogoAziendale from "./components/LogoAziendale";
+import {
+  normalizzaCliente,
+  normalizzaMezzo
+} from "./utils/normalizza";
 
 function App() {
   const [utente, setUtente] = useState(null);
@@ -75,11 +79,18 @@ function App() {
 
   const salvaSuFirebase = async (collezione, dati) => {
     try {
-      for (const item of dati) {
+      const normalizzati = collezione === "CLIENTI"
+        ? dati.map(normalizzaCliente)
+        : collezione === "MEZZI"
+        ? dati.map(normalizzaMezzo)
+        : dati;
+
+      for (const item of normalizzati) {
         await addDoc(collection(db, collezione), item);
       }
-      toast.success(`✅ ${dati.length} record salvati in "${collezione}"`);
-      await creaNotifica(`Importati ${dati.length} record in ${collezione}`, "success");
+
+      toast.success(`✅ ${normalizzati.length} record salvati in "${collezione}"`);
+      await creaNotifica(`Importati ${normalizzati.length} record in ${collezione}`, "success");
     } catch (error) {
       console.error("Errore nel salvataggio:", error);
       toast.error("❌ Errore nel salvataggio dei dati.");
@@ -105,10 +116,9 @@ function App() {
               element={
                 <>
                   <div className="d-flex align-items-center mb-4">
-                    <LogoAziendale altezza={60} className="me-3" /> {/* ✅ logo */}
+                    <LogoAziendale altezza={60} className="me-3" />
                     <h2 className="mb-0">Gestione Interventi</h2>
                   </div>
-
                   <NuovoIntervento onInserimento={() => setRefresh(!refresh)} />
                   <DashboardInterventi key={refresh} />
                 </>

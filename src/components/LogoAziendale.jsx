@@ -1,19 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 
-const LogoAziendale = ({ altezza = 60, stile = {}, className = "" }) => {
+const LogoAziendale = ({
+  altezza = 60,
+  larghezza,
+  stile = {},
+  className = "",
+  alt = "Logo Aziendale"
+}) => {
+  const [visibile, setVisibile] = useState(true);
   const src = `${process.env.PUBLIC_URL}/logo.png`;
 
   const handleError = (e) => {
-    e.target.style.display = "none";
+    setVisibile(false);
     console.warn("⚠️ Logo non trovato:", src);
   };
+
+  if (!visibile) return null;
 
   return (
     <img
       src={src}
-      alt="Logo Aziendale"
+      alt={alt}
       onError={handleError}
-      style={{ height: `${altezza}px`, ...stile }}
+      style={{
+        height: `${altezza}px`,
+        ...(larghezza ? { width: `${larghezza}px` } : {}),
+        objectFit: "contain",
+        ...stile
+      }}
       className={className}
     />
   );
