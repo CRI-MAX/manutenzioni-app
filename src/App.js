@@ -23,11 +23,8 @@ import ClientiTable from "./ClientiTable";
 import MezziTable from "./MezziTable";
 import DettaglioMezzo from "./DettaglioMezzo";
 import LogoAziendale from "./components/LogoAziendale";
-import DashboardUtenti from "./DashboardUtenti"; // ✅ aggiunto
-import {
-  normalizzaCliente,
-  normalizzaMezzo
-} from "./utils/normalizza";
+import DashboardUtenti from "./DashboardUtenti";
+import { normalizzaCliente, normalizzaMezzo } from "./utils/normalizza";
 
 function App() {
   const [utente, setUtente] = useState(null);
@@ -43,18 +40,10 @@ function App() {
           const utenti = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
           const trovato = utenti.find(u =>
-            u.UId === user.uid ||
-            u.uid === user.uid ||
-            u.UID === user.uid ||
-            u.Assigned_username === user.uid
+            u.UId === user.uid || u.uid === user.uid || u.UID === user.uid || u.Assigned_username === user.uid
           );
 
-          const ruolo = (
-            trovato?.Ruolo ||
-            trovato?.Role ||
-            trovato?.ruolo
-          )?.trim().toLowerCase() || "";
-
+          const ruolo = (trovato?.Ruolo || trovato?.Role || trovato?.ruolo)?.trim().toLowerCase() || "";
           setRuoloUtente(ruolo);
         } catch (error) {
           console.error("Errore nel recupero ruolo:", error);
@@ -125,7 +114,6 @@ function App() {
                 </>
               }
             />
-
             <Route
               path="/clienti"
               element={
@@ -143,7 +131,6 @@ function App() {
                   : <h5 className="text-danger">⛔ Accesso negato</h5>
               }
             />
-
             <Route
               path="/mezzi"
               element={
@@ -161,10 +148,8 @@ function App() {
                   : <h5 className="text-danger">⛔ Accesso negato</h5>
               }
             />
-
             <Route path="/mezzo/:mezzoId" element={<DettaglioMezzo />} />
             <Route path="/report" element={<h3>📊 Sezione Report (in costruzione)</h3>} />
-
             <Route
               path="/registrazione"
               element={
@@ -173,9 +158,7 @@ function App() {
                   : <h5 className="text-danger">⛔ Solo gli admin possono registrare nuovi utenti</h5>
               }
             />
-
             <Route path="/recupero" element={<RecuperoPassword />} />
-
             <Route
               path="/utenti"
               element={
@@ -184,7 +167,6 @@ function App() {
                   : <h5 className="text-danger">⛔ Solo gli admin possono gestire gli utenti</h5>
               }
             />
-
             <Route
               path="/dashboard-utenti"
               element={
@@ -193,7 +175,6 @@ function App() {
                   : <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
               }
             />
-
             <Route
               path="/admin"
               element={
@@ -202,7 +183,6 @@ function App() {
                   : <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
               }
             />
-
             <Route
               path="/log"
               element={
