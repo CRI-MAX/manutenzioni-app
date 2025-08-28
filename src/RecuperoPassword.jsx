@@ -13,6 +13,12 @@ const RecuperoPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessaggio("");
+
+    if (!email.trim()) {
+      setMessaggio("❌ Inserisci un'email valida.");
+      return;
+    }
+
     setLoading(true);
     try {
       await sendPasswordResetEmail(auth, email.trim());
@@ -26,13 +32,14 @@ const RecuperoPassword = () => {
   };
 
   return (
-    <Container className="login-container">
+    <Container className="login-container" style={{ maxWidth: "400px", marginTop: "40px" }}>
       <h4 className="mb-3 text-center">🔒 Recupera password</h4>
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Email registrata</Form.Label>
           <Form.Control
             type="email"
+            placeholder="Inserisci la tua email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -40,10 +47,10 @@ const RecuperoPassword = () => {
           />
         </Form.Group>
         <Button type="submit" variant="primary" disabled={loading} className="w-100">
-          {loading ? "Invio in corso..." : "Invia email"}
+          {loading ? "Invio in corso..." : "Invia email di recupero"}
         </Button>
         {messaggio && (
-          <div className={`mt-3 text-center ${messaggio.startsWith("❌") ? "text-danger" : "text-success"}`}>
+          <div className={`mt-3 text-center fw-semibold ${messaggio.startsWith("❌") ? "text-danger" : "text-success"}`}>
             {messaggio}
           </div>
         )}

@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "./firebase";
 import { toast } from "react-toastify";
@@ -7,6 +16,7 @@ import { toast } from "react-toastify";
 function ModificaMezzo({ mezzoId, onClose, onAggiorna }) {
   const [mezzo, setMezzo] = useState(null);
   const [file, setFile] = useState(null);
+  const [interventi, setInterventi] = useState([]);
 
   useEffect(() => {
     const fetchMezzo = async () => {
@@ -23,7 +33,26 @@ function ModificaMezzo({ mezzoId, onClose, onAggiorna }) {
         toast.error("❌ Errore nel caricamento");
       }
     };
-    fetchMezzo();
+
+    const fetchInterventi = async () => {
+      try {
+        const q = query(
+          collection(db, "INTERVENTI"),
+          where("mezzoId", "==", mezzoId),
+          orderBy("data", "desc")
+        );
+        const snapshot = await getDocs(q);
+        const dati = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setInterventi(dati);
+      } catch (error) {
+        console.error("Errore nel recupero interventi:", error);
+      }
+    };
+
+    if (mezzoId) {
+      fetchMezzo();
+      fetchInterventi();
+    }
   }, [mezzoId]);
 
   const handleChange = (e) => {
@@ -40,14 +69,19 @@ function ModificaMezzo({ mezzoId, onClose, onAggiorna }) {
   };
 
   const handleSave = async () => {
+    if (!mezzo.modello || !mezzo.clienteId) {
+      toast.warning("⚠️ Compila almeno Modello e Cliente ID");
+      return;
+    }
+
     try {
       const fotoUrl = await handleUploadFoto();
       const docRef = doc(db, "MEZZI", mezzo.id);
       await updateDoc(docRef, {
         modello: mezzo.modello,
-        marca: mezzo.marca,
-        targa: mezzo.targa,
-        anno: mezzo.anno,
+        marca: mezzo.marca || "",
+        targa: mezzo.targa || "",
+        anno: mezzo.anno || "",
         clienteId: mezzo.clienteId,
         note: mezzo.note || "",
         stato: mezzo.stato || "Disponibile",
@@ -69,7 +103,7 @@ function ModificaMezzo({ mezzoId, onClose, onAggiorna }) {
       <h5>✏️ Modifica Mezzo</h5>
 
       <div className="mb-2">
-        <label>Modello</label>
+        <label>Modello *</label>
         <input type="text" name="modello" className="form-control" value={mezzo.modello || ""} onChange={handleChange} />
       </div>
       <div className="mb-2">
@@ -85,7 +119,7 @@ function ModificaMezzo({ mezzoId, onClose, onAggiorna }) {
         <input type="text" name="anno" className="form-control" value={mezzo.anno || ""} onChange={handleChange} />
       </div>
       <div className="mb-2">
-        <label>Cliente ID</label>
+        <label>Cliente ID *</label>
         <input type="text" name="clienteId" className="form-control" value={mezzo.clienteId || ""} onChange={handleChange} />
       </div>
 
@@ -114,6 +148,22 @@ function ModificaMezzo({ mezzoId, onClose, onAggiorna }) {
           <img src={mezzo.fotoUrl} alt="Foto mezzo" className="img-thumbnail" style={{ maxWidth: "200px" }} />
         </div>
       )}
+
+      <div className="mt-4">
+        <h6>📁 Interventi associati</h6>
+        {interventi.length > 0 ? (
+          <ul className="list-group">
+            {interventi.map((int) => (
+              <li key={int.id} className="list-group-item">
+                <strong>{int.titolo || "Intervento"}</strong><br />
+                <small>{int.data || "—"} • {int.stato || "—"} • Tecnico: {int.tecnico || "—"}</small>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted">Nessun intervento registrato per questo mezzo.</p>
+        )}
+      </div>
 
       <div className="d-flex gap-2 mt-4">
         <button className="btn btn-success" onClick={handleSave}>💾 Salva</button>

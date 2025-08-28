@@ -69,85 +69,113 @@ function MezziTable() {
   };
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>🚚 Elenco Mezzi</h3>
-        <div className="d-flex gap-2">
-          <CsvExport
-            dati={filtrati}
-            intestazioni={intestazioni}
-            nomeFile="mezzi.csv"
-          />
-          <button className="btn btn-outline-success" onClick={esportaExcel}>
-            📤 Excel
-          </button>
-          <button className="btn btn-outline-secondary" onClick={stampaTabella}>
-            🖨️ Stampa
-          </button>
-        </div>
+    <div className="d-flex flex-wrap gap-4">
+      {/* 👉 Pannello laterale riepilogo */}
+      <div className="p-3 border rounded bg-light" style={{ minWidth: "300px", maxHeight: "80vh", overflowY: "auto" }}>
+        <h5 className="mb-3">📋 Riepilogo mezzi visibili</h5>
+        {filtrati.length > 0 ? (
+          <ul className="list-group">
+            {filtrati.map((m) => (
+              <li key={m.id} className="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{m.modello || "—"}</strong><br />
+                  <small>{m.marca || "—"} • {m.targa || "—"} • Cliente: {m.clienteId || "—"}</small>
+                </div>
+                <button
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={() => setMezzoDaModificare(m.id)}
+                >
+                  ✏️
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted">Nessun mezzo corrispondente alla ricerca.</p>
+        )}
       </div>
 
-      <input
-        type="text"
-        className="form-control mb-3"
-        placeholder="🔍 Cerca per modello, targa o cliente ID..."
-        value={filtro}
-        onChange={(e) => setFiltro(e.target.value)}
-      />
+      {/* 👉 Tabella principale */}
+      <div className="flex-grow-1">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h3>🚚 Elenco Mezzi</h3>
+          <div className="d-flex gap-2">
+            <CsvExport
+              dati={filtrati}
+              intestazioni={intestazioni}
+              nomeFile="mezzi.csv"
+            />
+            <button className="btn btn-outline-success" onClick={esportaExcel}>
+              📤 Excel
+            </button>
+            <button className="btn btn-outline-secondary" onClick={stampaTabella}>
+              🖨️ Stampa
+            </button>
+          </div>
+        </div>
 
-      {mezzoDaModificare && (
-        <ModificaMezzo
-          mezzoId={mezzoDaModificare}
-          onClose={() => setMezzoDaModificare(null)}
-          onAggiorna={fetchMezzi}
+        <input
+          type="text"
+          className="form-control mb-3"
+          placeholder="🔍 Cerca per modello, targa o cliente ID..."
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
         />
-      )}
 
-      <table className="table table-bordered table-hover">
-        <thead className="table-light">
-          <tr>
-            <th>Modello</th>
-            <th>Marca</th>
-            <th>Targa</th>
-            <th>Anno</th>
-            <th>Cliente ID</th>
-            <th>Azioni</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtrati.length > 0 ? (
-            filtrati.map((m) => (
-              <tr key={m.id}>
-                <td>{m.modello || "—"}</td>
-                <td>{m.marca || "—"}</td>
-                <td>{m.targa || "—"}</td>
-                <td>{m.anno || "—"}</td>
-                <td>{m.clienteId || "—"}</td>
-                <td className="d-flex gap-2">
-                  <button
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={() => setMezzoDaModificare(m.id)}
-                  >
-                    ✏️ Modifica
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => eliminaMezzo(m.id, m.modello)}
-                  >
-                    🗑️ Elimina
-                  </button>
+        {mezzoDaModificare && (
+          <ModificaMezzo
+            mezzoId={mezzoDaModificare}
+            onClose={() => setMezzoDaModificare(null)}
+            onAggiorna={fetchMezzi}
+          />
+        )}
+
+        <table className="table table-bordered table-hover">
+          <thead className="table-light">
+            <tr>
+              <th>Modello</th>
+              <th>Marca</th>
+              <th>Targa</th>
+              <th>Anno</th>
+              <th>Cliente ID</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtrati.length > 0 ? (
+              filtrati.map((m) => (
+                <tr key={m.id}>
+                  <td>{m.modello || "—"}</td>
+                  <td>{m.marca || "—"}</td>
+                  <td>{m.targa || "—"}</td>
+                  <td>{m.anno || "—"}</td>
+                  <td>{m.clienteId || "—"}</td>
+                  <td className="d-flex gap-2">
+                    <button
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => setMezzoDaModificare(m.id)}
+                    >
+                      ✏️ Modifica
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => eliminaMezzo(m.id, m.modello)}
+                    >
+                      🗑️ Elimina
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center text-muted">
+                  Nessun mezzo trovato.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center text-muted">
-                Nessun mezzo trovato.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

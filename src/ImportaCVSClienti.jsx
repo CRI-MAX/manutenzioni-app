@@ -35,7 +35,7 @@ const ImportaCSVClienti = () => {
             email: riga["Email"] || riga["EMail"] || "",
             telefono: riga["Telefono"] || riga["Telefono 1"] || "",
             referente: riga["Referente"] || riga["Contatti"] || "",
-            dataCreazione: new Date()
+            dataCreazione: new Date().toISOString() // ✅ convertita in stringa
           }));
 
           for (const cliente of clientiCorretti) {

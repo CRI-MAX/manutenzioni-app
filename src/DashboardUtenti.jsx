@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
 import { normalizzaUtente } from "./utils/normalizza";
+import DateDisplay from "./components/DateDisplay"; // ✅ integrato
 
 function DashboardUtenti() {
   const [utenti, setUtenti] = useState([]);
@@ -84,7 +85,7 @@ function DashboardUtenti() {
               <td>{u.email}</td>
               <td>{u.ruolo}</td>
               <td>{u.attivo ? "✅" : "⛔"}</td>
-              <td>{u.dataCreazione?.seconds ? new Date(u.dataCreazione.seconds * 1000).toLocaleDateString() : "—"}</td>
+              <td><DateDisplay data={u.dataCreazione} /></td> {/* ✅ blindato */}
             </tr>
           ))}
         </tbody>

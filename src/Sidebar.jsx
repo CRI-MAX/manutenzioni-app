@@ -1,13 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "./Sidebar.css"; // Puoi integrare in App.css se preferisci
-import LogoAziendale from "./components/LogoAziendale"; // ✅ nuovo import
+import "./Sidebar.css";
+import LogoAziendale from "./components/LogoAziendale";
 
 function Sidebar({ ruolo }) {
   return (
     <div className="sidebar">
       <div className="text-center mb-3">
-        <LogoAziendale altezza={50} className="sidebar-logo" /> {/* ✅ logo */}
+        <LogoAziendale altezza={50} className="sidebar-logo" />
+        <div className="text-muted mt-2" style={{ fontSize: "0.9em" }}>
+          Ruolo: <strong>{ruolo}</strong>
+        </div>
       </div>
 
       <h4 className="sidebar-title">📋 Menu</h4>
@@ -30,11 +33,14 @@ function Sidebar({ ruolo }) {
 
         <Link to="/report">📊 Report</Link>
         <Link to="/recupero">🔐 Recupero Password</Link>
+      </nav>
 
-        {/* 🔐 Se vuoi aggiungere logout o profilo in futuro:
+      <hr className="my-3" />
+
+      <h6 className="sidebar-subtitle">👤 Account</h6>
+      <nav className="sidebar-nav">
         <Link to="/profilo">👤 Profilo</Link>
         <Link to="/logout">🚪 Logout</Link>
-        */}
       </nav>
     </div>
   );

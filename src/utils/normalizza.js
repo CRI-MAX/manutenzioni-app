@@ -1,46 +1,63 @@
+// 🧠 Funzione generica per normalizzare un campo
+const normalizzaCampo = (obj, chiavi, fallback = "—") => {
+  for (const k of chiavi) {
+    const val = obj[k];
+    if (val !== undefined && val !== null && val !== "") return val;
+  }
+  return fallback;
+};
+
 // 👥 Clienti
 export const normalizzaCliente = (c) => ({
-  ragioneSociale: c.ragioneSociale || c["Ragione Sociale"] || c.Cliente || "—",
-  email: c.email || c.Email || c["E-mail"] || "—",
-  telefono: c.telefono || c.Telefono || c["Telefono 1"] || "—",
-  indirizzo: c.indirizzo || c.Indirizzo || c["Indirizzo esteso"] || "—",
-  referente: c.referente || c.Referente || "—"
+  ragioneSociale: normalizzaCampo(c, ["ragioneSociale", "Ragione Sociale", "Cliente"]),
+  email: normalizzaCampo(c, ["email", "Email", "E-mail"]),
+  telefono: normalizzaCampo(c, ["telefono", "Telefono", "Telefono 1"]),
+  indirizzo: normalizzaCampo(c, ["indirizzo", "Indirizzo", "Indirizzo esteso"]),
+  referente: normalizzaCampo(c, ["referente", "Referente"])
 });
 
 // 🚚 Mezzi
 export const normalizzaMezzo = (m) => ({
-  modello: m.modello || m["Modello"] || m["Mezzo"] || "—",
-  targa: m.targa || m["Targa"] || "—",
-  marca: m.marca || m["Marca"] || "—",
-  anno: m.anno || m["Anno"] || "—",
-  clienteId: m.clienteId || m["Cliente ID"] || "—"
+  modello: normalizzaCampo(m, ["modello", "Modello", "Mezzo"]),
+  targa: normalizzaCampo(m, ["targa", "Targa"]),
+  marca: normalizzaCampo(m, ["marca", "Marca"]),
+  anno: normalizzaCampo(m, ["anno", "Anno"]),
+  clienteId: normalizzaCampo(m, ["clienteId", "Cliente ID"])
 });
 
 // 👤 Utenti
 export const normalizzaUtente = (u) => ({
-  nome: u.nome || u.Nome || u["Nome completo"] || "—",
-  email: u.email || u.EMail || "—",
-  ruolo: u.ruolo || u.Ruolo || u.Role || "—",
-  uid: u.uid || u.UId || u.UID || u.Assigned_username || "—",
+  nome: normalizzaCampo(u, ["nome", "Nome", "Nome completo"]),
+  email: normalizzaCampo(u, ["email", "EMail"]),
+  ruolo: normalizzaCampo(u, ["ruolo", "Ruolo", "Role"]),
+  uid: normalizzaCampo(u, ["uid", "UId", "UID", "Assigned_username"]),
   attivo: u.attivo ?? true
 });
 
 // 🛠️ Interventi
 export const normalizzaIntervento = (i) => ({
-  titolo: i.titolo || i["Titolo intervento"] || "—",
-  descrizione: i.descrizione || i["Descrizione"] || "—",
-  stato: i.stato || i["Stato"] || "in attesa",
-  tecnico: i.tecnico || i["Tecnico assegnato"] || "—",
-  clienteId: i.clienteId || i["Cliente ID"] || "—",
-  mezzoId: i.mezzoId || i["Mezzo ID"] || "—",
-  data: i.data || i["Data intervento"] || "—",
-  priorita: i.priorita || i["Priorità"] || "normale"
+  titolo: normalizzaCampo(i, ["titolo", "Titolo intervento"]),
+  descrizione: normalizzaCampo(i, ["descrizione", "Descrizione"]),
+  stato: normalizzaCampo(i, ["stato", "Stato"], "in attesa"),
+  tecnico: normalizzaCampo(i, ["tecnico", "Tecnico assegnato"]),
+  clienteId: normalizzaCampo(i, ["clienteId", "Cliente ID"]),
+  mezzoId: normalizzaCampo(i, ["mezzoId", "Mezzo ID"]),
+  data: normalizzaCampo(i, ["data", "Data intervento"]),
+  priorita: normalizzaCampo(i, ["priorita", "Priorità"], "normale")
 });
 
 // 🔔 Notifiche
 export const normalizzaNotifica = (n) => ({
-  messaggio: n.messaggio || n["Messaggio"] || "—",
-  tipo: n.tipo || n["Tipo"] || "info",
-  utente: n.utente || n["Utente"] || "—",
-  timestamp: n.timestamp || n["Data"] || "—"
+  messaggio: normalizzaCampo(n, ["messaggio", "Messaggio"]),
+  tipo: normalizzaCampo(n, ["tipo", "Tipo"], "info"),
+  utente: normalizzaCampo(n, ["utente", "Utente"]),
+  timestamp: n.timestamp || n["Data"] || null
+});
+
+// 📎 Allegati (opzionale)
+export const normalizzaAllegato = (a) => ({
+  nome: normalizzaCampo(a, ["nome", "Nome file"]),
+  url: normalizzaCampo(a, ["url", "Link"]),
+  tipo: normalizzaCampo(a, ["tipo", "Tipo"], "documento"),
+  dataCaricamento: a.dataCaricamento || a["Data"] || null
 });

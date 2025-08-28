@@ -13,6 +13,8 @@ const NuovoIntervento = ({ onInserimento }) => {
   const [clienteNome, setClienteNome] = useState("");
   const [tipo, setTipo] = useState("Ordinario");
   const [tecnico, setTecnico] = useState("");
+  const [firmaTecnico, setFirmaTecnico] = useState("");
+  const [urgente, setUrgente] = useState(false);
   const [note, setNote] = useState("");
   const [cadenza, setCadenza] = useState("Trimestrale");
   const [file, setFile] = useState(null);
@@ -70,7 +72,7 @@ const NuovoIntervento = ({ onInserimento }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!mezzoId || !tecnico.trim()) {
+    if (!mezzoId || !tecnico.trim() || !firmaTecnico.trim()) {
       alert("Compila tutti i campi obbligatori.");
       return;
     }
@@ -88,6 +90,8 @@ const NuovoIntervento = ({ onInserimento }) => {
         mezzoId,
         tipo,
         tecnico: tecnico.trim(),
+        firmaTecnico: firmaTecnico.trim(),
+        urgente,
         note: note.trim(),
         stato: "Effettuato",
         data: Timestamp.fromDate(dataIntervento),
@@ -98,6 +102,8 @@ const NuovoIntervento = ({ onInserimento }) => {
       setMezzoId("");
       setTipo("Ordinario");
       setTecnico("");
+      setFirmaTecnico("");
+      setUrgente(false);
       setNote("");
       setCadenza("Trimestrale");
       setFile(null);
@@ -158,6 +164,20 @@ const NuovoIntervento = ({ onInserimento }) => {
       <Form.Group className="mb-2">
         <Form.Label>Tecnico</Form.Label>
         <Form.Control value={tecnico} onChange={(e) => setTecnico(e.target.value)} required />
+      </Form.Group>
+
+      <Form.Group className="mb-2">
+        <Form.Label>Firma del tecnico</Form.Label>
+        <Form.Control value={firmaTecnico} onChange={(e) => setFirmaTecnico(e.target.value)} required />
+      </Form.Group>
+
+      <Form.Group className="mb-2">
+        <Form.Check
+          type="checkbox"
+          label="🚨 Intervento urgente"
+          checked={urgente}
+          onChange={(e) => setUrgente(e.target.checked)}
+        />
       </Form.Group>
 
       <Form.Group className="mb-2">

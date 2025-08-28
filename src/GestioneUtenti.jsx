@@ -12,6 +12,7 @@ import { db } from "./firebase";
 import { normalizzaUtente } from "./utils/normalizza";
 import CsvExport from "./CsvExport";
 import { toast } from "react-toastify";
+import Badge from "react-bootstrap/Badge";
 
 function GestioneUtenti() {
   const [utenti, setUtenti] = useState([]);
@@ -19,12 +20,17 @@ function GestioneUtenti() {
 
   useEffect(() => {
     const fetchUtenti = async () => {
-      const snapshot = await getDocs(collection(db, "UTENTI"));
-      const dati = snapshot.docs.map(d => ({
-        id: d.id,
-        ...normalizzaUtente(d.data())
-      }));
-      setUtenti(dati);
+      try {
+        const snapshot = await getDocs(collection(db, "UTENTI"));
+        const dati = snapshot.docs.map(d => ({
+          id: d.id,
+          ...normalizzaUtente(d.data())
+        }));
+        setUtenti(dati);
+      } catch (error) {
+        console.error("Errore nel caricamento utenti:", error);
+        toast.error("❌ Errore nel caricamento utenti");
+      }
     };
     fetchUtenti();
   }, []);
@@ -87,10 +93,25 @@ function GestioneUtenti() {
   ];
 
   const filtrati = utenti.filter(u =>
-    u.nome.toLowerCase().includes(filtro.toLowerCase()) ||
-    u.email.toLowerCase().includes(filtro.toLowerCase()) ||
-    u.ruolo.toLowerCase().includes(filtro.toLowerCase())
+    [u.nome, u.email, u.ruolo]
+      .filter(Boolean)
+      .some(val => val.toLowerCase().includes(filtro.toLowerCase()))
   );
+
+  const renderStatoBadge = (attivo) => (
+    <Badge bg={attivo ? "success" : "secondary"}>
+      {attivo ? "Attivo" : "Disattivo"}
+    </Badge>
+  );
+
+  const renderRuoloBadge = (ruolo) => {
+    const colori = {
+      admin: "danger",
+      tecnico: "primary",
+      cliente: "info"
+    };
+    return <Badge bg={colori[ruolo] || "secondary"}>{ruolo}</Badge>;
+  };
 
   return (
     <div>
@@ -111,8 +132,8 @@ function GestioneUtenti() {
         onChange={(e) => setFiltro(e.target.value)}
       />
 
-      <table className="table table-bordered">
-        <thead>
+      <table className="table table-bordered table-hover">
+        <thead className="table-light">
           <tr>
             <th>Nome</th>
             <th>Email</th>
@@ -128,17 +149,20 @@ function GestioneUtenti() {
                 <td>{u.nome}</td>
                 <td>{u.email}</td>
                 <td>
-                  <select
-                    className="form-select form-select-sm"
-                    value={u.ruolo}
-                    onChange={(e) => cambiaRuolo(u.id, e.target.value)}
-                  >
-                    <option value="admin">Admin</option>
-                    <option value="tecnico">Tecnico</option>
-                    <option value="cliente">Cliente</option>
-                  </select>
+                  <div className="d-flex align-items-center gap-2">
+                    {renderRuoloBadge(u.ruolo)}
+                    <select
+                      className="form-select form-select-sm"
+                      value={u.ruolo}
+                      onChange={(e) => cambiaRuolo(u.id, e.target.value)}
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="tecnico">Tecnico</option>
+                      <option value="cliente">Cliente</option>
+                    </select>
+                  </div>
                 </td>
-                <td>{u.attivo ? "✅ Attivo" : "⛔ Disattivo"}</td>
+                <td>{renderStatoBadge(u.attivo)}</td>
                 <td className="d-flex gap-2">
                   <button
                     className="btn btn-sm btn-outline-secondary"

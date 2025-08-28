@@ -10,42 +10,38 @@ import * as XLSX from "xlsx";
 
 const Mezzi = () => {
   const [mezzi, setMezzi] = useState([]);
-  const [filtrati, setFiltrati] = useState([]);
   const [clienti, setClienti] = useState([]);
   const [modello, setModello] = useState("");
   const [clienteId, setClienteId] = useState("");
   const [query, setQuery] = useState("");
+  const [filtroCliente, setFiltroCliente] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const [mezziSnap, clientiSnap] = await Promise.all([
-        getDocs(collection(db, "MEZZI")),
-        getDocs(collection(db, "CLIENTI")),
-      ]);
-      const mezziData = mezziSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const clientiData = clientiSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setMezzi(mezziData);
-      setFiltrati(mezziData);
-      setClienti(clientiData);
-    } catch (error) {
-      console.error("Errore nel caricamento dei dati:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [mezziSnap, clientiSnap] = await Promise.all([
+          getDocs(collection(db, "MEZZI")),
+          getDocs(collection(db, "CLIENTI")),
+        ]);
+        const mezziData = mezziSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const clientiData = clientiSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setMezzi(mezziData);
+        setClienti(clientiData);
+      } catch (error) {
+        console.error("Errore nel caricamento dei dati:", error);
+      }
+    };
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const q = query.toLowerCase();
-    const risultati = mezzi.filter(m =>
-      Object.values(m).some(val =>
-        String(val).toLowerCase().includes(q)
-      )
-    );
-    setFiltrati(risultati);
-  }, [query, mezzi]);
+  const getClienteNome = (id) =>
+    clienti.find(c => c.id === id)?.ragioneSociale || "—";
+
+  const filtrati = mezzi.filter(m =>
+    (!filtroCliente || m.clienteId === filtroCliente) &&
+    (!query || m.modello?.toLowerCase().includes(query.toLowerCase()))
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,16 +58,15 @@ const Mezzi = () => {
       });
       setModello("");
       setClienteId("");
-      fetchData();
+      const snapshot = await getDocs(collection(db, "MEZZI"));
+      const mezziData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setMezzi(mezziData);
     } catch (error) {
       console.error("Errore nel salvataggio del mezzo:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  const getClienteNome = (id) =>
-    clienti.find(c => c.id === id)?.ragioneSociale || "—";
 
   const esportaCSV = () => {
     const righe = filtrati.map(m =>
@@ -143,11 +138,29 @@ const Mezzi = () => {
       <div className="d-flex flex-wrap gap-2 mb-3">
         <Form.Control
           type="text"
-          placeholder="🔍 Cerca mezzo..."
+          placeholder="🔍 Cerca per modello..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{ maxWidth: "300px" }}
         />
+        <Form.Select
+          value={filtroCliente}
+          onChange={(e) => setFiltroCliente(e.target.value)}
+          style={{ maxWidth: "300px" }}
+        >
+          <option value="">Tutti i clienti</option>
+          {clienti.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.ragioneSociale}
+            </option>
+          ))}
+        </Form.Select>
+        <Button variant="outline-secondary" onClick={() => {
+          setQuery("");
+          setFiltroCliente("");
+        }}>
+          🔄 Reset filtri
+        </Button>
         <Button variant="success" onClick={esportaCSV}>📤 CSV</Button>
         <Button variant="info" onClick={esportaExcel}>📊 Excel</Button>
         <Button variant="secondary" onClick={stampaTabella}>🖨️ Stampa</Button>

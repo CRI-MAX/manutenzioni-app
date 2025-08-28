@@ -41,18 +41,20 @@ const ImportaExcel = ({ tipo }) => {
                 email: item.email || "—",
                 telefono: item.telefono || "—",
                 referente: item.referente || "—",
+                dataCreazione: new Date().toISOString() // ✅ blindato
               }
             : {
                 marca: item.marca || "—",
                 modello: item.modello || "—",
                 matricola: item.matricola || "—",
                 clienteId: item.clienteId || "—",
+                dataCreazione: new Date().toISOString() // ✅ blindato
               };
 
         await addDoc(collection(db, collezione), record);
       }
 
-      setMessaggio("✅ Importazione completata con successo.");
+      setMessaggio(`✅ Importazione completata con successo. (${dati.length} record)`);
       setFile(null);
     } catch (error) {
       console.error("Errore durante l'importazione:", error);
