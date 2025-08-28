@@ -15,19 +15,18 @@ const MezziTable = () => {
   const [modificaMezzo, setModificaMezzo] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    const fetchMezzi = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "MEZZI"));
-        const dati = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setMezzi(dati);
-        setFiltrati(dati);
-        console.log("Mezzi caricati:", dati);
-      } catch (error) {
-        console.error("Errore nel caricamento mezzi:", error);
-      }
-    };
+  const fetchMezzi = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "MEZZI"));
+      const dati = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setMezzi(dati);
+      setFiltrati(dati);
+    } catch (error) {
+      console.error("Errore nel caricamento mezzi:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchMezzi();
   }, []);
 
@@ -44,7 +43,7 @@ const MezziTable = () => {
   const eliminaMezzo = async (id) => {
     try {
       await deleteDoc(doc(db, "MEZZI", id));
-      setMezzi(prev => prev.filter(m => m.id !== id));
+      await fetchMezzi();
     } catch (error) {
       console.error("Errore nell'eliminazione:", error);
     }
@@ -60,9 +59,7 @@ const MezziTable = () => {
       const ref = doc(db, "MEZZI", modificaMezzo.id);
       const { id, ...dati } = modificaMezzo;
       await updateDoc(ref, dati);
-      setMezzi(prev =>
-        prev.map(m => (m.id === id ? modificaMezzo : m))
-      );
+      await fetchMezzi();
       setShowModal(false);
     } catch (error) {
       console.error("Errore nella modifica:", error);
@@ -71,7 +68,7 @@ const MezziTable = () => {
 
   const esportaCSV = () => {
     const righe = filtrati.map(m =>
-      `"${m.targa}","${m.modello}","${m.marca}","${m.anno}"`
+      `"${m.targa || ""}","${m.modello || ""}","${m.marca || ""}","${m.anno || ""}"`
     );
     const header = `"Targa","Modello","Marca","Anno"`;
     const contenuto = [header, ...righe].join("\n");

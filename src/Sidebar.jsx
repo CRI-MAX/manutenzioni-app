@@ -1,10 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Sidebar.css"; // Puoi integrare in App.css se preferisci
+import LogoAziendale from "./components/LogoAziendale"; // ✅ nuovo import
 
 function Sidebar({ ruolo }) {
   return (
     <div className="sidebar">
+      <div className="text-center mb-3">
+        <LogoAziendale altezza={50} className="sidebar-logo" /> {/* ✅ logo */}
+      </div>
+
       <h4 className="sidebar-title">📋 Menu</h4>
       <nav className="sidebar-nav">
         <Link to="/">🏠 Dashboard</Link>

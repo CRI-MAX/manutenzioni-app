@@ -21,18 +21,29 @@ function CsvUploader({ titolo = "Importa CSV", collezione = "CLIENTI" }) {
         const raw = results.data;
 
         const corretti = raw.map((riga) => {
-          const cliente = {
-            ragioneSociale: riga["Cliente"] || riga["Ragione Sociale"] || riga["Nome completo"] || "—",
-            indirizzo: riga["Indirizzo"] || riga["Indirizzo esteso"] || "",
-            telefono: riga["Telefono"] || riga["Telefono 1"] || "",
-            email: riga["Email"] || riga["EMail"] || "",
-            partitaIVA: riga["Partita IVA"] || "",
-            comune: riga["Comune"] || "",
-            referente: riga["Referente"] || riga["Contatti"] || "",
-            cellulare: riga["Cellulare"] || "",
-            dataCreazione: new Date()
-          };
-          return cliente;
+          if (collezione === "CLIENTI") {
+            return {
+              ragioneSociale: riga["Cliente"] || riga["Ragione Sociale"] || riga["Nome completo"] || "—",
+              indirizzo: riga["Indirizzo"] || riga["Indirizzo esteso"] || "",
+              telefono: riga["Telefono"] || riga["Telefono 1"] || "",
+              email: riga["Email"] || riga["EMail"] || "",
+              partitaIVA: riga["Partita IVA"] || "",
+              comune: riga["Comune"] || "",
+              referente: riga["Referente"] || riga["Contatti"] || "",
+              cellulare: riga["Cellulare"] || "",
+              dataCreazione: new Date()
+            };
+          } else if (collezione === "MEZZI") {
+            return {
+              modello: riga["Modello"] || riga["Mezzo"] || "—",
+              targa: riga["Targa"] || "",
+              marca: riga["Marca"] || "",
+              anno: riga["Anno"] || "",
+              clienteId: riga["Cliente ID"] || ""
+            };
+          } else {
+            return riga;
+          }
         });
 
         setDati(corretti);

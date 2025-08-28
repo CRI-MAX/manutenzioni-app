@@ -15,19 +15,18 @@ const ClientiTable = () => {
   const [modificaCliente, setModificaCliente] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    const fetchClienti = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "CLIENTI"));
-        const dati = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setClienti(dati);
-        setFiltrati(dati);
-        console.log("Clienti caricati:", dati);
-      } catch (error) {
-        console.error("Errore nel caricamento clienti:", error);
-      }
-    };
+  const fetchClienti = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "CLIENTI"));
+      const dati = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setClienti(dati);
+      setFiltrati(dati);
+    } catch (error) {
+      console.error("Errore nel caricamento clienti:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchClienti();
   }, []);
 
@@ -44,7 +43,7 @@ const ClientiTable = () => {
   const eliminaCliente = async (id) => {
     try {
       await deleteDoc(doc(db, "CLIENTI", id));
-      setClienti(prev => prev.filter(c => c.id !== id));
+      await fetchClienti();
     } catch (error) {
       console.error("Errore nell'eliminazione:", error);
     }
@@ -60,9 +59,7 @@ const ClientiTable = () => {
       const ref = doc(db, "CLIENTI", modificaCliente.id);
       const { id, ...dati } = modificaCliente;
       await updateDoc(ref, dati);
-      setClienti(prev =>
-        prev.map(c => (c.id === id ? modificaCliente : c))
-      );
+      await fetchClienti();
       setShowModal(false);
     } catch (error) {
       console.error("Errore nella modifica:", error);
@@ -71,7 +68,7 @@ const ClientiTable = () => {
 
   const esportaCSV = () => {
     const righe = filtrati.map(c =>
-      `"${c.ragioneSociale}","${c.email}","${c.telefono}","${c.indirizzo}"`
+      `"${c.ragioneSociale || c.Cliente || c["Nome completo"] || ""}","${c.email || ""}","${c.telefono || ""}","${c.indirizzo || ""}"`
     );
     const header = `"Ragione Sociale","Email","Telefono","Indirizzo"`;
     const contenuto = [header, ...righe].join("\n");
@@ -84,7 +81,7 @@ const ClientiTable = () => {
 
   const esportaExcel = () => {
     const dati = filtrati.map(c => ({
-      "Ragione Sociale": c.ragioneSociale || "",
+      "Ragione Sociale": c.ragioneSociale || c.Cliente || c["Nome completo"] || "",
       Email: c.email || "",
       Telefono: c.telefono || "",
       Indirizzo: c.indirizzo || ""
@@ -130,7 +127,7 @@ const ClientiTable = () => {
           {filtrati.length > 0 ? (
             filtrati.map((c) => (
               <tr key={c.id}>
-                <td>{c.ragioneSociale || "—"}</td>
+                <td>{c.ragioneSociale || c.Cliente || c["Nome completo"] || "—"}</td>
                 <td>{c.email || "—"}</td>
                 <td>{c.telefono || "—"}</td>
                 <td>{c.indirizzo || "—"}</td>

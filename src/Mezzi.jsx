@@ -79,7 +79,7 @@ const Mezzi = () => {
 
   const esportaCSV = () => {
     const righe = filtrati.map(m =>
-      `"${m.modello}","${getClienteNome(m.clienteId)}"`
+      `"${m.modello || ""}","${getClienteNome(m.clienteId)}"`
     );
     const header = `"Modello","Cliente"`;
     const contenuto = [header, ...righe].join("\n");

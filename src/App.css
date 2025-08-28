@@ -45,6 +45,21 @@
   background-color: #495057;
 }
 
+/* Logo aziendale */
+.sidebar-logo {
+  display: block;
+  margin: 0 auto;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+.login-logo {
+  display: block;
+  margin: 0 auto;
+  max-height: 60px;
+  object-fit: contain;
+}
+
 /* Contenuto principale */
 .main-content {
   flex-grow: 1;
@@ -132,11 +147,6 @@ input, select, textarea {
   text-align: center;
   width: 100%;
   max-width: 400px;
-}
-
-.login-logo {
-  height: 60px;
-  margin-bottom: 1rem;
 }
 
 .login-box input {

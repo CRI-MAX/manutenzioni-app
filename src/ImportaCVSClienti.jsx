@@ -28,17 +28,21 @@ const ImportaCSVClienti = () => {
       skipEmptyLines: true,
       complete: async (results) => {
         try {
-          for (const cliente of results.data) {
-            await addDoc(collection(db, "clienti"), {
-              ragioneSociale: cliente.ragioneSociale || "—",
-              partitaIVA: cliente.partitaIVA || "—",
-              indirizzo: cliente.indirizzo || "—",
-              email: cliente.email || "—",
-              telefono: cliente.telefono || "—",
-              referente: cliente.referente || "—",
-            });
+          const clientiCorretti = results.data.map((riga) => ({
+            ragioneSociale: riga["Cliente"] || riga["Ragione Sociale"] || riga["Nome completo"] || "—",
+            partitaIVA: riga["Partita IVA"] || riga["P.IVA"] || "",
+            indirizzo: riga["Indirizzo"] || riga["Indirizzo esteso"] || "",
+            email: riga["Email"] || riga["EMail"] || "",
+            telefono: riga["Telefono"] || riga["Telefono 1"] || "",
+            referente: riga["Referente"] || riga["Contatti"] || "",
+            dataCreazione: new Date()
+          }));
+
+          for (const cliente of clientiCorretti) {
+            await addDoc(collection(db, "CLIENTI"), cliente);
           }
-          setMessaggio("✅ Importazione completata con successo.");
+
+          setMessaggio(`✅ Importati ${clientiCorretti.length} clienti con successo.`);
           setFile(null);
         } catch (error) {
           console.error("Errore durante l'importazione:", error);
@@ -47,6 +51,11 @@ const ImportaCSVClienti = () => {
           setLoading(false);
         }
       },
+      error: (err) => {
+        console.error("Errore nel parsing CSV:", err);
+        setMessaggio("❌ Errore nel parsing del file.");
+        setLoading(false);
+      }
     });
   };
 

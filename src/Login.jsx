@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
 import "./App.css";
+import LogoAziendale from "./components/LogoAziendale"; // ✅ nuovo import
 
 function Login({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -23,7 +24,7 @@ function Login({ onLogin }) {
   return (
     <div className="login-container">
       <div className="login-box">
-        <img src="/logo.png" alt="Logo" className="login-logo" />
+        <LogoAziendale altezza={60} className="login-logo mb-3" /> {/* ✅ logo */}
         <h2>Accesso al sistema EVI</h2>
         <form onSubmit={handleLogin}>
           <input

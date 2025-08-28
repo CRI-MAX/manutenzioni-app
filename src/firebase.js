@@ -9,7 +9,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyC6k_leG6tFdsOsUdg_iOVdQ21_uTE4CQM",
   authDomain: "manper-e1973.firebaseapp.com",
   projectId: "manper-e1973",
-  storageBucket: "manper-e1973.firebasestorage.app",
+  storageBucket: "manper-e1973.appspot.com", // 🔧 corretto dominio per Storage
   messagingSenderId: "858629526676",
   appId: "1:858629526676:web:e9a71249bb806614d05081",
   measurementId: "G-YF22QCMGR3"

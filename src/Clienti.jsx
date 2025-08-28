@@ -26,13 +26,17 @@ const Clienti = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchClienti = async () => {
-    const snapshot = await getDocs(collection(db, "CLIENTI"));
-    const lista = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setClienti(lista);
-    setFiltrati(lista);
+    try {
+      const snapshot = await getDocs(collection(db, "CLIENTI"));
+      const lista = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setClienti(lista);
+      setFiltrati(lista);
+    } catch (error) {
+      console.error("Errore nel caricamento clienti:", error);
+    }
   };
 
   useEffect(() => {
@@ -88,21 +92,25 @@ const Clienti = () => {
 
   const handleEdit = (cliente) => {
     setEditingId(cliente.id);
-    setRagioneSociale(cliente.ragioneSociale);
+    setRagioneSociale(cliente.ragioneSociale || "");
     setPartitaIva(cliente.partitaIva || "");
     setReferente(cliente.referente || "");
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("Sei sicuro di voler eliminare questo cliente?")) {
-      await deleteDoc(doc(db, "CLIENTI", id));
-      fetchClienti();
+      try {
+        await deleteDoc(doc(db, "CLIENTI", id));
+        fetchClienti();
+      } catch (error) {
+        console.error("Errore nell'eliminazione:", error);
+      }
     }
   };
 
   const esportaCSV = () => {
     const righe = filtrati.map(c =>
-      `"${c.ragioneSociale}","${c.partitaIva}","${c.referente}"`
+      `"${c.ragioneSociale || ""}","${c.partitaIva || ""}","${c.referente || ""}"`
     );
     const header = `"Ragione Sociale","Partita IVA","Referente"`;
     const contenuto = [header, ...righe].join("\n");
@@ -206,7 +214,7 @@ const Clienti = () => {
           {filtrati.length > 0 ? (
             filtrati.map((c) => (
               <tr key={c.id}>
-                <td>{c.ragioneSociale}</td>
+                <td>{c.ragioneSociale || "—"}</td>
                 <td>{c.partitaIva || "—"}</td>
                 <td>{c.referente || "—"}</td>
                 <td>

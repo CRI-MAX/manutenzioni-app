@@ -22,6 +22,7 @@ import CsvUploader from "./CsvUploader";
 import ClientiTable from "./ClientiTable";
 import MezziTable from "./MezziTable";
 import DettaglioMezzo from "./DettaglioMezzo";
+import LogoAziendale from "./components/LogoAziendale"; // ✅ nuovo import
 
 function App() {
   const [utente, setUtente] = useState(null);
@@ -104,12 +105,7 @@ function App() {
               element={
                 <>
                   <div className="d-flex align-items-center mb-4">
-                    <img
-                      src={`${process.env.PUBLIC_URL}/logo.png`}
-                      alt="Logo Aziendale"
-                      onError={(e) => { e.target.style.display = "none"; }}
-                      style={{ height: "60px", marginRight: "1rem" }}
-                    />
+                    <LogoAziendale altezza={60} className="me-3" /> {/* ✅ logo */}
                     <h2 className="mb-0">Gestione Interventi</h2>
                   </div>
 
