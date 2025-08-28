@@ -16,9 +16,9 @@ const DashboardInterventi = () => {
     const fetchData = async () => {
       try {
         const [interventiSnap, mezziSnap, clientiSnap] = await Promise.all([
-          getDocs(collection(db, "interventi")),
-          getDocs(collection(db, "mezzi")),
-          getDocs(collection(db, "clienti")),
+          getDocs(collection(db, "INTERVENTI")),
+          getDocs(collection(db, "MEZZI")),
+          getDocs(collection(db, "CLIENTI")),
         ]);
 
         setInterventi(interventiSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -70,14 +70,14 @@ const DashboardInterventi = () => {
       <Form className="d-flex gap-3 mb-3">
         <Form.Select value={filtroStato} onChange={(e) => setFiltroStato(e.target.value)}>
           <option value="">Tutti gli stati</option>
-          <option value="Effettuato">Effettuato</option>
-          <option value="Programmato">Programmato</option>
-          <option value="In Ritardo">In Ritardo</option>
+          <option value="Effettuato">✅ Effettuato</option>
+          <option value="Programmato">📅 Programmato</option>
+          <option value="In Ritardo">⏰ In Ritardo</option>
         </Form.Select>
 
         <Form.Control
           type="text"
-          placeholder="Cerca mezzo o tecnico"
+          placeholder="🔍 Cerca mezzo o tecnico"
           value={filtroTesto}
           onChange={(e) => setFiltroTesto(e.target.value)}
         />

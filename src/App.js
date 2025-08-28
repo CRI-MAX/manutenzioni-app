@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -21,6 +21,7 @@ import LogAttivita from "./LogAttivita";
 import CsvUploader from "./CsvUploader";
 import ClientiTable from "./ClientiTable";
 import MezziTable from "./MezziTable";
+import DettaglioMezzo from "./DettaglioMezzo";
 
 function App() {
   const [utente, setUtente] = useState(null);
@@ -51,6 +52,7 @@ function App() {
           setRuoloUtente(ruolo);
         } catch (error) {
           console.error("Errore nel recupero ruolo:", error);
+          toast.error("❌ Errore nel recupero del ruolo utente.");
         }
       }
     });
@@ -63,7 +65,7 @@ function App() {
         messaggio,
         tipo,
         utente: utente?.email || "sconosciuto",
-        timestamp: new Date().toISOString()
+        timestamp: Timestamp.now()
       });
     } catch (error) {
       console.error("Errore nella creazione notifica:", error);
@@ -103,7 +105,7 @@ function App() {
                 <>
                   <div className="d-flex align-items-center mb-4">
                     <img
-                      src="/logo.png"
+                      src={`${process.env.PUBLIC_URL}/logo.png`}
                       alt="Logo Aziendale"
                       onError={(e) => { e.target.style.display = "none"; }}
                       style={{ height: "60px", marginRight: "1rem" }}
@@ -122,8 +124,14 @@ function App() {
               element={
                 ruoloUtente === "admin"
                   ? <>
-                      <CsvUploader titolo="Importa Clienti" onUpload={(dati) => salvaSuFirebase("CLIENTI", dati)} />
-                      <ClientiTable />
+                      <CsvUploader
+                        titolo="Importa Clienti"
+                        onUpload={async (dati) => {
+                          await salvaSuFirebase("CLIENTI", dati);
+                          setRefresh(!refresh);
+                        }}
+                      />
+                      <ClientiTable key={refresh} />
                     </>
                   : <h5 className="text-danger">⛔ Accesso negato</h5>
               }
@@ -134,12 +142,20 @@ function App() {
               element={
                 ["admin", "tecnico"].includes(ruoloUtente)
                   ? <>
-                      <CsvUploader titolo="Importa Mezzi" onUpload={(dati) => salvaSuFirebase("MEZZI", dati)} />
-                      <MezziTable />
+                      <CsvUploader
+                        titolo="Importa Mezzi"
+                        onUpload={async (dati) => {
+                          await salvaSuFirebase("MEZZI", dati);
+                          setRefresh(!refresh);
+                        }}
+                      />
+                      <MezziTable key={refresh} />
                     </>
                   : <h5 className="text-danger">⛔ Accesso negato</h5>
               }
             />
+
+            <Route path="/mezzo/:mezzoId" element={<DettaglioMezzo />} />
 
             <Route path="/report" element={<h3>📊 Sezione Report (in costruzione)</h3>} />
 

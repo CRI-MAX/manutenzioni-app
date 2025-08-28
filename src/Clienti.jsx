@@ -12,10 +12,13 @@ import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import ImportaExcel from "./ImportaExcel"; // ⬅️ Importa il componente di importazione
+import ImportaExcel from "./ImportaExcel";
+import * as XLSX from "xlsx";
 
 const Clienti = () => {
   const [clienti, setClienti] = useState([]);
+  const [filtrati, setFiltrati] = useState([]);
+  const [query, setQuery] = useState("");
   const [ragioneSociale, setRagioneSociale] = useState("");
   const [partitaIva, setPartitaIva] = useState("");
   const [referente, setReferente] = useState("");
@@ -23,17 +26,28 @@ const Clienti = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchClienti = async () => {
-    const snapshot = await getDocs(collection(db, "clienti"));
+    const snapshot = await getDocs(collection(db, "CLIENTI"));
     const lista = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
     setClienti(lista);
+    setFiltrati(lista);
   };
 
   useEffect(() => {
     fetchClienti();
   }, []);
+
+  useEffect(() => {
+    const q = query.toLowerCase();
+    const risultati = clienti.filter(c =>
+      Object.values(c).some(val =>
+        String(val).toLowerCase().includes(q)
+      )
+    );
+    setFiltrati(risultati);
+  }, [query, clienti]);
 
   const resetForm = () => {
     setRagioneSociale("");
@@ -59,9 +73,9 @@ const Clienti = () => {
 
     try {
       if (editingId) {
-        await updateDoc(doc(db, "clienti", editingId), clienteData);
+        await updateDoc(doc(db, "CLIENTI", editingId), clienteData);
       } else {
-        await addDoc(collection(db, "clienti"), clienteData);
+        await addDoc(collection(db, "CLIENTI"), clienteData);
       }
       resetForm();
       fetchClienti();
@@ -81,21 +95,47 @@ const Clienti = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Sei sicuro di voler eliminare questo cliente?")) {
-      await deleteDoc(doc(db, "clienti", id));
+      await deleteDoc(doc(db, "CLIENTI", id));
       fetchClienti();
     }
+  };
+
+  const esportaCSV = () => {
+    const righe = filtrati.map(c =>
+      `"${c.ragioneSociale}","${c.partitaIva}","${c.referente}"`
+    );
+    const header = `"Ragione Sociale","Partita IVA","Referente"`;
+    const contenuto = [header, ...righe].join("\n");
+    const blob = new Blob([contenuto], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "clienti.csv";
+    link.click();
+  };
+
+  const esportaExcel = () => {
+    const dati = filtrati.map(c => ({
+      "Ragione Sociale": c.ragioneSociale || "",
+      "Partita IVA": c.partitaIva || "",
+      Referente: c.referente || ""
+    }));
+    const ws = XLSX.utils.json_to_sheet(dati);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Clienti");
+    XLSX.writeFile(wb, "clienti.xlsx");
+  };
+
+  const stampaTabella = () => {
+    window.print();
   };
 
   return (
     <Container className="mt-4">
       <h2 className="mb-4">📁 Gestione Clienti</h2>
 
-      <ImportaExcel tipo="clienti" /> {/* ⬅️ Sezione importazione da Excel */}
+      <ImportaExcel tipo="clienti" />
 
-      <Form
-        onSubmit={handleSubmit}
-        className="mb-4 p-3 border rounded bg-light"
-      >
+      <Form onSubmit={handleSubmit} className="mb-4 p-3 border rounded bg-light">
         <h5 className="mb-3">
           {editingId ? "✏️ Modifica cliente" : "➕ Aggiungi nuovo cliente"}
         </h5>
@@ -140,6 +180,19 @@ const Clienti = () => {
         )}
       </Form>
 
+      <div className="d-flex flex-wrap gap-2 mb-3">
+        <Form.Control
+          type="text"
+          placeholder="🔍 Cerca cliente..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          style={{ maxWidth: "300px" }}
+        />
+        <Button variant="success" onClick={esportaCSV}>📤 CSV</Button>
+        <Button variant="info" onClick={esportaExcel}>📊 Excel</Button>
+        <Button variant="secondary" onClick={stampaTabella}>🖨️ Stampa</Button>
+      </div>
+
       <Table striped bordered hover responsive>
         <thead>
           <tr>
@@ -150,8 +203,8 @@ const Clienti = () => {
           </tr>
         </thead>
         <tbody>
-          {clienti.length > 0 ? (
-            clienti.map((c) => (
+          {filtrati.length > 0 ? (
+            filtrati.map((c) => (
               <tr key={c.id}>
                 <td>{c.ragioneSociale}</td>
                 <td>{c.partitaIva || "—"}</td>
@@ -162,14 +215,14 @@ const Clienti = () => {
                     variant="outline-primary"
                     onClick={() => handleEdit(c)}
                   >
-                    Modifica
+                    ✏️
                   </Button>{" "}
                   <Button
                     size="sm"
                     variant="outline-danger"
                     onClick={() => handleDelete(c.id)}
                   >
-                    Elimina
+                    🗑️
                   </Button>
                 </td>
               </tr>

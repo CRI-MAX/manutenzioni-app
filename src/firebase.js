@@ -1,4 +1,4 @@
-// 🔥 Configurazione Firebase
+// 🔥 Inizializzazione Firebase
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -15,10 +15,11 @@ const firebaseConfig = {
   measurementId: "G-YF22QCMGR3"
 };
 
-// 🚀 Inizializza Firebase
+// 🚀 Inizializza l'app Firebase
 const app = initializeApp(firebaseConfig);
 
 // 📦 Esporta i servizi principali
 export const db = getFirestore(app);       // Firestore Database
 export const auth = getAuth(app);          // Autenticazione
-export const storage = getStorage(app);    // Storage per allegati
+export const storage = getStorage(app);    // Storage per file e documenti
+export default app;                        // Istanza principale (opzionale)

@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import NotifichePanel from "./NotifichePanel"; // ✅ nuovo componente
+import NotifichePanel from "./NotifichePanel";
 
 const DashboardAdmin = () => {
   const [stats, setStats] = useState({
@@ -22,10 +22,10 @@ const DashboardAdmin = () => {
     const fetchStats = async () => {
       try {
         const [utentiSnap, interventiSnap, mezziSnap, clientiSnap] = await Promise.all([
-          getDocs(collection(db, "utenti")),
-          getDocs(collection(db, "interventi")),
-          getDocs(collection(db, "mezzi")),
-          getDocs(collection(db, "clienti")),
+          getDocs(collection(db, "UTENTI")),
+          getDocs(collection(db, "INTERVENTI")),
+          getDocs(collection(db, "MEZZI")),
+          getDocs(collection(db, "CLIENTI")),
         ]);
 
         const interventi = interventiSnap.docs.map((doc) => doc.data());
@@ -62,8 +62,8 @@ const DashboardAdmin = () => {
       <h3 className="mb-4">📊 Dashboard Amministratore</h3>
       <Row>
         {Object.entries(stats).map(([key, value]) => (
-          <Col md={4} className="mb-3" key={key}>
-            <Card className="shadow-sm">
+          <Col md={4} sm={6} xs={12} className="mb-3" key={key}>
+            <Card className="shadow-sm text-center">
               <Card.Body>
                 <Card.Title>{titoli[key] || key}</Card.Title>
                 <h4 className="text-primary">{value}</h4>
