@@ -19,6 +19,8 @@ import GestioneUtenti from "./GestioneUtenti";
 import DashboardAdmin from "./DashboardAdmin";
 import LogAttivita from "./LogAttivita";
 import CsvUploader from "./CsvUploader";
+import ClientiTable from "./ClientiTable";
+import MezziTable from "./MezziTable";
 
 function App() {
   const [utente, setUtente] = useState(null);
@@ -119,7 +121,10 @@ function App() {
               path="/clienti"
               element={
                 ruoloUtente === "admin"
-                  ? <CsvUploader titolo="Importa Clienti" onUpload={(dati) => salvaSuFirebase("CLIENTI", dati)} />
+                  ? <>
+                      <CsvUploader titolo="Importa Clienti" onUpload={(dati) => salvaSuFirebase("CLIENTI", dati)} />
+                      <ClientiTable />
+                    </>
                   : <h5 className="text-danger">⛔ Accesso negato</h5>
               }
             />
@@ -128,7 +133,10 @@ function App() {
               path="/mezzi"
               element={
                 ["admin", "tecnico"].includes(ruoloUtente)
-                  ? <CsvUploader titolo="Importa Mezzi" onUpload={(dati) => salvaSuFirebase("MEZZI", dati)} />
+                  ? <>
+                      <CsvUploader titolo="Importa Mezzi" onUpload={(dati) => salvaSuFirebase("MEZZI", dati)} />
+                      <MezziTable />
+                    </>
                   : <h5 className="text-danger">⛔ Accesso negato</h5>
               }
             />
