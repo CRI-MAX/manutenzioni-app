@@ -1,0 +1,34 @@
+.notifiche-panel {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.notifiche-panel h4 {
+  margin-bottom: 1rem;
+}
+
+.notifiche-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.notifica {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid #0d6efd;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.notifica.success { border-left-color: #198754; }
+.notifica.error { border-left-color: #dc3545; }
+.notifica.warning { border-left-color: #ffc107; }
+.notifica.info { border-left-color: #0d6efd; }
+
+.timestamp {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-right: 0.5rem;
+}
