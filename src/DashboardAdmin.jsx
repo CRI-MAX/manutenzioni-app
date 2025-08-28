@@ -6,6 +6,7 @@ import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import NotifichePanel from "./NotifichePanel";
+import CSVUploaderAndViewer from "./CSVUploaderAndViewer";
 
 const DashboardAdmin = () => {
   const [stats, setStats] = useState({
@@ -60,6 +61,7 @@ const DashboardAdmin = () => {
   return (
     <Container className="mt-4">
       <h3 className="mb-4">📊 Dashboard Amministratore</h3>
+
       <Row>
         {Object.entries(stats).map(([key, value]) => (
           <Col md={4} sm={6} xs={12} className="mb-3" key={key}>
@@ -75,6 +77,10 @@ const DashboardAdmin = () => {
 
       <div className="mt-5">
         <NotifichePanel />
+      </div>
+
+      <div className="mt-5">
+        <CSVUploaderAndViewer />
       </div>
     </Container>
   );
