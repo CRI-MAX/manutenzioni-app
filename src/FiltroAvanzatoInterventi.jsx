@@ -5,37 +5,49 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 /**
- * Filtro per la mappa degli interventi.
- * Permette di filtrare per stato, tecnico e intervallo di date.
+ * Filtro avanzato per la dashboard interventi.
  */
-const FiltroMappaInterventi = ({
-  stato,
+const FiltroAvanzatoInterventi = ({
+  cliente,
+  tipo,
   tecnico,
   dataDa,
   dataA,
-  onStatoChange,
+  allegatiPresenti,
+  onClienteChange,
+  onTipoChange,
   onTecnicoChange,
   onDataDaChange,
   onDataAChange,
+  onAllegatiToggle,
   onReset,
-  tecniciDisponibili = []
+  tecniciDisponibili = [],
+  tipiDisponibili = []
 }) => {
-  const isDateRangeValid = !dataDa || !dataA || dataA >= dataDa;
-
   return (
-    <div className="d-flex flex-wrap gap-3 mb-3 align-items-end">
+    <div className="d-flex flex-wrap gap-3 mb-4 align-items-end">
       <div>
-        <Form.Label>Stato</Form.Label>
+        <Form.Label>Cliente</Form.Label>
+        <Form.Control
+          type="text"
+          value={cliente}
+          onChange={(e) => onClienteChange(e.target.value)}
+          placeholder="🔍 Ragione sociale"
+          style={{ maxWidth: "220px" }}
+        />
+      </div>
+
+      <div>
+        <Form.Label>Tipo intervento</Form.Label>
         <Form.Select
-          value={stato}
-          onChange={(e) => onStatoChange(e.target.value)}
+          value={tipo}
+          onChange={(e) => onTipoChange(e.target.value)}
           style={{ maxWidth: "200px" }}
-          aria-label="Filtro stato intervento"
         >
-          <option value="">Tutti gli stati</option>
-          <option value="Effettuato">✅ Effettuato</option>
-          <option value="Programmato">📅 Programmato</option>
-          <option value="In Ritardo">⏰ In Ritardo</option>
+          <option value="">Tutti i tipi</option>
+          {tipiDisponibili.map((t, i) => (
+            <option key={i} value={t}>{t}</option>
+          ))}
         </Form.Select>
       </div>
 
@@ -45,12 +57,10 @@ const FiltroMappaInterventi = ({
           value={tecnico}
           onChange={(e) => onTecnicoChange(e.target.value)}
           style={{ maxWidth: "200px" }}
-          disabled={tecniciDisponibili.length === 0}
-          aria-label="Filtro tecnico"
         >
           <option value="">Tutti i tecnici</option>
-          {tecniciDisponibili.map((nome, i) => (
-            <option key={i} value={nome}>{nome}</option>
+          {tecniciDisponibili.map((t, i) => (
+            <option key={i} value={t}>{t}</option>
           ))}
         </Form.Select>
       </div>
@@ -63,7 +73,6 @@ const FiltroMappaInterventi = ({
           dateFormat="dd/MM/yyyy"
           className="form-control"
           placeholderText="Data inizio"
-          title="Data inizio"
         />
       </div>
 
@@ -75,12 +84,17 @@ const FiltroMappaInterventi = ({
           dateFormat="dd/MM/yyyy"
           className="form-control"
           placeholderText="Data fine"
-          title="Data fine"
           minDate={dataDa || null}
         />
-        {!isDateRangeValid && (
-          <small className="text-danger">⚠️ La data finale non può precedere quella iniziale.</small>
-        )}
+      </div>
+
+      <div className="form-check mt-2">
+        <Form.Check
+          type="checkbox"
+          label="📎 Solo con allegati"
+          checked={allegatiPresenti}
+          onChange={onAllegatiToggle}
+        />
       </div>
 
       <div>
@@ -92,4 +106,4 @@ const FiltroMappaInterventi = ({
   );
 };
 
-export default FiltroMappaInterventi;
+export default FiltroAvanzatoInterventi;

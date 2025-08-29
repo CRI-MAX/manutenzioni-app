@@ -4,6 +4,7 @@ import { db } from "./firebase";
 import { toast } from "react-toastify";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+// import { CSVLink } from "react-csv"; // opzionale
 
 function GestioneRuoli() {
   const [utenti, setUtenti] = useState([]);
@@ -34,6 +35,7 @@ function GestioneRuoli() {
 
   const aggiornaRuolo = async (id, nuovoRuolo) => {
     if (!["admin", "tecnico", "cliente"].includes(nuovoRuolo)) return;
+    if (!window.confirm(`Confermi il cambio ruolo in "${nuovoRuolo}"?`)) return;
     try {
       const ref = doc(db, "UTENTI", id);
       await updateDoc(ref, { Role: nuovoRuolo });
@@ -50,11 +52,21 @@ function GestioneRuoli() {
     u.email.toLowerCase().includes(filtroEmail.toLowerCase())
   );
 
+  const totali = {
+    admin: utenti.filter(u => u.ruolo === "admin").length,
+    tecnico: utenti.filter(u => u.ruolo === "tecnico").length,
+    cliente: utenti.filter(u => u.ruolo === "cliente").length
+  };
+
   if (loading) return <p className="text-muted p-3">🔄 Caricamento utenti...</p>;
 
   return (
     <div className="container mt-4">
       <h3>🛠️ Gestione Ruoli Utenti</h3>
+
+      <div className="mb-3">
+        <strong>Totali:</strong> Admin: {totali.admin} — Tecnici: {totali.tecnico} — Clienti: {totali.cliente}
+      </div>
 
       <div className="d-flex gap-3 mb-3 flex-wrap">
         <Form.Select
@@ -75,12 +87,28 @@ function GestioneRuoli() {
           onChange={(e) => setFiltroEmail(e.target.value)}
           style={{ maxWidth: "300px" }}
         />
+
         <Button variant="outline-secondary" onClick={() => {
           setFiltroRuolo("");
           setFiltroEmail("");
         }}>
           🔄 Reset filtri
         </Button>
+
+        {/* 
+        <CSVLink
+          data={filtrati}
+          headers={[
+            { label: "Email", key: "email" },
+            { label: "UID", key: "uid" },
+            { label: "Ruolo", key: "ruolo" }
+          ]}
+          filename="utenti_ruoli.csv"
+          className="btn btn-outline-primary"
+        >
+          📤 Esporta CSV
+        </CSVLink>
+        */}
       </div>
 
       <table className="table table-bordered table-hover">

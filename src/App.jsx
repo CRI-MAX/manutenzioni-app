@@ -18,13 +18,15 @@ import RecuperoPassword from "./RecuperoPassword";
 import GestioneUtenti from "./GestioneUtenti";
 import DashboardAdmin from "./DashboardAdmin";
 import LogAttivita from "./LogAttivita";
-import CsvUploader from "./CsvUploader";
 import ClientiTable from "./ClientiTable";
 import MezziTable from "./MezziTable";
 import DettaglioMezzo from "./DettaglioMezzo";
 import LogoAziendale from "./components/LogoAziendale";
 import DashboardUtenti from "./DashboardUtenti";
 import { normalizzaCliente, normalizzaMezzo } from "./utils/normalizza";
+
+// ✅ Importa ImportaFile per upload CSV/XLSX
+import { ImportaFile } from "./components/CSVImporter";
 
 function App() {
   const [utente, setUtente] = useState(null);
@@ -118,8 +120,8 @@ function App() {
               element={
                 ruoloUtente === "admin" ? (
                   <>
-                    <CsvUploader
-                      titolo="Importa Clienti"
+                    <ImportaFile
+                      titolo="📥 Importa Clienti (.csv o .xlsx)"
                       onUpload={async (dati) => {
                         await salvaSuFirebase("CLIENTI", dati);
                         setRefresh(!refresh);
@@ -137,8 +139,8 @@ function App() {
               element={
                 ["admin", "tecnico"].includes(ruoloUtente) ? (
                   <>
-                    <CsvUploader
-                      titolo="Importa Mezzi"
+                    <ImportaFile
+                      titolo="📥 Importa Mezzi (.csv o .xlsx)"
                       onUpload={async (dati) => {
                         await salvaSuFirebase("MEZZI", dati);
                         setRefresh(!refresh);

@@ -12,8 +12,10 @@ import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import ImportaExcel from "./ImportaExcel";
 import * as XLSX from "xlsx";
+
+// ✅ Importa i componenti modulari
+import { SafeRow, ImportaFile } from "./components/CSVImporter";
 
 const Clienti = () => {
   const [clienti, setClienti] = useState([]);
@@ -45,8 +47,8 @@ const Clienti = () => {
 
   useEffect(() => {
     const q = query.toLowerCase();
-    const risultati = clienti.filter(c =>
-      Object.values(c).some(val =>
+    const risultati = clienti.filter((c) =>
+      Object.values(c).some((val) =>
         String(val).toLowerCase().includes(q)
       )
     );
@@ -108,8 +110,19 @@ const Clienti = () => {
     }
   };
 
+  const salvaImportati = async (dati) => {
+    try {
+      for (const item of dati) {
+        await addDoc(collection(db, "CLIENTI"), item);
+      }
+      fetchClienti();
+    } catch (error) {
+      console.error("Errore importazione:", error);
+    }
+  };
+
   const esportaCSV = () => {
-    const righe = filtrati.map(c =>
+    const righe = filtrati.map((c) =>
       `"${c.ragioneSociale || ""}","${c.partitaIva || ""}","${c.referente || ""}"`
     );
     const header = `"Ragione Sociale","Partita IVA","Referente"`;
@@ -122,10 +135,10 @@ const Clienti = () => {
   };
 
   const esportaExcel = () => {
-    const dati = filtrati.map(c => ({
+    const dati = filtrati.map((c) => ({
       "Ragione Sociale": c.ragioneSociale || "",
       "Partita IVA": c.partitaIva || "",
-      Referente: c.referente || ""
+      Referente: c.referente || "",
     }));
     const ws = XLSX.utils.json_to_sheet(dati);
     const wb = XLSX.utils.book_new();
@@ -141,7 +154,10 @@ const Clienti = () => {
     <Container className="mt-4">
       <h2 className="mb-4">📁 Gestione Clienti</h2>
 
-      <ImportaExcel tipo="clienti" />
+      <ImportaFile
+        titolo="📥 Importa Clienti (.csv o .xlsx)"
+        onUpload={salvaImportati}
+      />
 
       <Form onSubmit={handleSubmit} className="mb-4 p-3 border rounded bg-light">
         <h5 className="mb-3">
@@ -214,9 +230,7 @@ const Clienti = () => {
           {filtrati.length > 0 ? (
             filtrati.map((c) => (
               <tr key={c.id}>
-                <td>{c.ragioneSociale || "—"}</td>
-                <td>{c.partitaIva || "—"}</td>
-                <td>{c.referente || "—"}</td>
+                <SafeRow row={c} />
                 <td>
                   <Button
                     size="sm"

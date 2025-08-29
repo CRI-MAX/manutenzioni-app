@@ -6,6 +6,7 @@ const {
   validateArgs
 } = require("firebase/data-connect");
 
+// 🔧 Configurazione del connettore
 const connectorConfig = {
   connector: "example",
   service: "manutenzioni-app",

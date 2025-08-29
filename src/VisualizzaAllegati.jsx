@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
  */
 function VisualizzaAllegati({ allegati = [], mezzoId, onAggiorna }) {
   const handleDelete = async (allegato) => {
+    if (!allegato?.url || !mezzoId) return;
     if (!window.confirm(`Vuoi eliminare l'allegato "${allegato.nome || "senza nome"}"?`)) return;
 
     try {
@@ -37,9 +38,14 @@ function VisualizzaAllegati({ allegati = [], mezzoId, onAggiorna }) {
   return (
     <div className="mt-2">
       {allegati.map((a, i) => (
-        <div key={i} className="mb-3 d-flex align-items-start gap-3">
+        <div key={i} className="mb-3 d-flex align-items-start gap-3 flex-wrap">
           {a.tipo === "foto" ? (
-            <a href={a.url} target="_blank" rel="noopener noreferrer">
+            <a
+              href={a.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={a.nome || `Allegato ${i + 1}`}
+            >
               <img
                 src={a.url}
                 alt={a.nome || `Allegato ${i + 1}`}
@@ -53,6 +59,7 @@ function VisualizzaAllegati({ allegati = [], mezzoId, onAggiorna }) {
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline-secondary btn-sm"
+              title={a.nome || `Documento ${i + 1}`}
             >
               📄 {a.nome || `Documento ${i + 1}`}
             </a>

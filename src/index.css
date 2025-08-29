@@ -8,25 +8,31 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #333;
+  line-height: 1.6;
 }
 
 /* 💻 Font monospace per codice */
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+  background-color: #f1f3f5;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 /* 🔗 Link generici */
 a {
   color: #007bff;
   text-decoration: none;
+  transition: color 0.2s ease-in-out;
 }
 
 a:hover {
   text-decoration: underline;
+  color: #0056b3;
 }
 
-/* 🧩 Utility */
+/* 🧩 Utility colori */
 .text-muted {
   color: #6c757d !important;
 }
@@ -43,8 +49,31 @@ a:hover {
   color: #ffc107 !important;
 }
 
+.text-primary {
+  color: #0d6efd !important;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
 /* 🖼️ Immagini responsive */
 img {
   max-width: 100%;
   height: auto;
+  display: block;
+}
+
+/* 📱 Responsive container */
+.container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* ✨ Transizioni per bottoni */
+button,
+input[type="submit"] {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }

@@ -16,7 +16,7 @@ import * as XLSX from "xlsx";
 import AllegatiIntervento from "./AllegatiIntervento";
 import VisualizzaAllegati from "./VisualizzaAllegati";
 import DateDisplay from "./components/DateDisplay";
-import BadgeStato from "./components/BadgeStato"; // ✅ nuovo componente
+import BadgeStato from "./components/BadgeStato";
 
 const InterventiTable = () => {
   const [interventi, setInterventi] = useState([]);
@@ -37,7 +37,6 @@ const InterventiTable = () => {
         console.error("Errore nel caricamento interventi:", error);
       }
     };
-
     fetchInterventi();
   }, []);
 
@@ -214,4 +213,9 @@ const InterventiTable = () => {
               >
                 <option value="">—</option>
                 <option value="Effettuato">Effettuato</option>
-                <option value="Programmato">Programmato
+                <option value="Programmato">Programmato</option>
+                <option value="In Ritardo">In Ritardo</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-2">
+              <Form.Label>Note</Form.Label>

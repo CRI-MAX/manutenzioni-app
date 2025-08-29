@@ -3,7 +3,11 @@ import { Link } from "react-router-dom";
 import "./Sidebar.css";
 import LogoAziendale from "./components/LogoAziendale";
 
-function Sidebar({ ruolo }) {
+function Sidebar({ ruolo = "ospite" }) {
+  const isAdmin = ruolo === "admin";
+  const isTecnico = ruolo === "tecnico";
+  const isCliente = ruolo === "cliente";
+
   return (
     <div className="sidebar">
       <div className="text-center mb-3">
@@ -17,11 +21,11 @@ function Sidebar({ ruolo }) {
       <nav className="sidebar-nav">
         <Link to="/">🏠 Dashboard</Link>
 
-        {(ruolo === "admin" || ruolo === "tecnico") && (
+        {(isAdmin || isTecnico) && (
           <Link to="/mezzi">🚚 Mezzi</Link>
         )}
 
-        {ruolo === "admin" && (
+        {isAdmin && (
           <>
             <Link to="/clienti">👥 Clienti</Link>
             <Link to="/registrazione">➕ Registrazione</Link>

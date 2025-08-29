@@ -6,7 +6,9 @@ import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import NotifichePanel from "./NotifichePanel";
-import CSVUploaderAndViewer from "./CSVUploaderAndViewer";
+
+// ✅ Importa CsvUploader per upload e anteprima
+import CsvUploader from "./CsvUploader";
 
 const DashboardAdmin = () => {
   const [stats, setStats] = useState({
@@ -80,7 +82,8 @@ const DashboardAdmin = () => {
       </div>
 
       <div className="mt-5">
-        <CSVUploaderAndViewer />
+        <CsvUploader titolo="📥 Importa Clienti" collezione="CLIENTI" />
+        <CsvUploader titolo="📥 Importa Mezzi" collezione="MEZZI" />
       </div>
     </Container>
   );

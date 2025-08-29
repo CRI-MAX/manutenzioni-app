@@ -48,4 +48,38 @@ button {
 button:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
+/* Celle non valide */
+.cell-non-valida {
+  background-color: #ffe6e6;
+}
+
+/* Input inline nelle celle */
+.csv-table input.form-control-sm {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+/* Pulsanti secondari */
+.btn-outline-danger {
+  background-color: transparent;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-outline-secondary {
+  background-color: transparent;
+  border: 1px solid #6c757d;
+  color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: white;
 }

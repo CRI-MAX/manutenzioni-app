@@ -5,11 +5,15 @@ import { db } from "./firebase";
 import Container from "react-bootstrap/Container";
 import Table from "react-bootstrap/Table";
 import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
 import UploadFotoMezzo from "./UploadFotoMezzo";
 import AllegatiIntervento from "./AllegatiIntervento";
 import VisualizzaAllegati from "./VisualizzaAllegati";
 import DateDisplay from "./components/DateDisplay";
-import BadgeStato from "./components/BadgeStato"; // ✅ nuovo componente
+import BadgeStato from "./components/BadgeStato";
+import { CSVLink } from "react-csv";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const DettaglioMezzo = () => {
   const { mezzoId } = useParams();
@@ -48,6 +52,33 @@ const DettaglioMezzo = () => {
 
   if (!mezzo) return <p className="text-muted p-3">🔄 Caricamento dettagli mezzo...</p>;
 
+  const intestazioniCSV = [
+    { label: "Data", key: "data" },
+    { label: "Tipo", key: "tipo" },
+    { label: "Tecnico", key: "tecnico" },
+    { label: "Note", key: "note" },
+    { label: "Stato", key: "stato" },
+    { label: "Prossima Scadenza", key: "prossimaScadenza" }
+  ];
+
+  const interventiExport = interventi.map((i) => ({
+    data: i.data?.toDate?.().toISOString?.() || "—",
+    tipo: i.tipo || "—",
+    tecnico: i.tecnico || "—",
+    note: i.note || "—",
+    stato: i.stato || "—",
+    prossimaScadenza: i.prossimaScadenza?.toDate?.().toISOString?.() || "—"
+  }));
+
+  const esportaExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(interventiExport);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Interventi");
+    const buffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([buffer], { type: "application/octet-stream" });
+    saveAs(blob, `storico_interventi_${mezzoId}.xlsx`);
+  };
+
   return (
     <Container className="mt-4">
       <h2 className="mb-4">🚚 Dettaglio Mezzo</h2>
@@ -70,7 +101,25 @@ const DettaglioMezzo = () => {
         </Card.Body>
       </Card>
 
-      <h5 className="mb-3">🛠️ Storico Interventi</h5>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h5 className="mb-0">🛠️ Storico Interventi</h5>
+        {interventi.length > 0 && (
+          <div className="d-flex gap-2">
+            <CSVLink
+              data={interventiExport}
+              headers={intestazioniCSV}
+              filename={`storico_interventi_${mezzoId}.csv`}
+              className="btn btn-outline-primary btn-sm"
+            >
+              📤 CSV
+            </CSVLink>
+            <Button variant="outline-success" size="sm" onClick={esportaExcel}>
+              📊 Excel
+            </Button>
+          </div>
+        )}
+      </div>
+
       <Table striped bordered hover responsive>
         <thead>
           <tr>

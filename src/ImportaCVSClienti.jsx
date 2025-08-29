@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Papa from "papaparse";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "./firebase";
@@ -10,6 +10,7 @@ const ImportaCSVClienti = () => {
   const [file, setFile] = useState(null);
   const [messaggio, setMessaggio] = useState("");
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef();
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -28,15 +29,28 @@ const ImportaCSVClienti = () => {
       skipEmptyLines: true,
       complete: async (results) => {
         try {
-          const clientiCorretti = results.data.map((riga) => ({
-            ragioneSociale: riga["Cliente"] || riga["Ragione Sociale"] || riga["Nome completo"] || "—",
-            partitaIVA: riga["Partita IVA"] || riga["P.IVA"] || "",
-            indirizzo: riga["Indirizzo"] || riga["Indirizzo esteso"] || "",
-            email: riga["Email"] || riga["EMail"] || "",
-            telefono: riga["Telefono"] || riga["Telefono 1"] || "",
-            referente: riga["Referente"] || riga["Contatti"] || "",
-            dataCreazione: new Date().toISOString() // ✅ convertita in stringa
-          }));
+          const clientiCorretti = results.data
+            .map((riga, index) => {
+              const ragioneSociale = riga["Cliente"] || riga["Ragione Sociale"] || riga["Nome completo"];
+              if (!ragioneSociale) return null;
+
+              return {
+                ragioneSociale: ragioneSociale.trim(),
+                partitaIVA: riga["Partita IVA"] || riga["P.IVA"] || "",
+                indirizzo: riga["Indirizzo"] || riga["Indirizzo esteso"] || "",
+                email: riga["Email"] || riga["EMail"] || "",
+                telefono: riga["Telefono"] || riga["Telefono 1"] || "",
+                referente: riga["Referente"] || riga["Contatti"] || "",
+                dataCreazione: new Date().toISOString()
+              };
+            })
+            .filter(Boolean);
+
+          if (clientiCorretti.length === 0) {
+            setMessaggio("❌ Nessun cliente valido trovato nel file.");
+            setLoading(false);
+            return;
+          }
 
           for (const cliente of clientiCorretti) {
             await addDoc(collection(db, "CLIENTI"), cliente);
@@ -44,6 +58,7 @@ const ImportaCSVClienti = () => {
 
           setMessaggio(`✅ Importati ${clientiCorretti.length} clienti con successo.`);
           setFile(null);
+          if (fileInputRef.current) fileInputRef.current.value = "";
         } catch (error) {
           console.error("Errore durante l'importazione:", error);
           setMessaggio("❌ Errore durante l'importazione.");
@@ -65,12 +80,17 @@ const ImportaCSVClienti = () => {
 
       <Form.Group className="mb-3">
         <Form.Label>Seleziona file CSV</Form.Label>
-        <Form.Control type="file" accept=".csv" onChange={handleFileChange} />
+        <Form.Control
+          type="file"
+          accept=".csv"
+          onChange={handleFileChange}
+          ref={fileInputRef}
+        />
         {file && <div className="mt-2 text-muted">📎 File selezionato: {file.name}</div>}
       </Form.Group>
 
       <Button variant="success" onClick={handleImport} disabled={loading}>
-        {loading ? "Importazione in corso..." : "Importa clienti"}
+        {loading ? "⏳ Importazione in corso..." : "Importa clienti"}
       </Button>
 
       {messaggio && (

@@ -46,13 +46,7 @@
 }
 
 /* Logo aziendale */
-.sidebar-logo {
-  display: block;
-  margin: 0 auto;
-  max-height: 60px;
-  object-fit: contain;
-}
-
+.sidebar-logo,
 .login-logo {
   display: block;
   margin: 0 auto;
@@ -74,17 +68,9 @@ h2, h3, h4 {
   margin-bottom: 1rem;
 }
 
-h2 {
-  font-size: 1.8rem;
-}
-
-h3 {
-  font-size: 1.5rem;
-}
-
-h4 {
-  font-size: 1.2rem;
-}
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.2rem; }
 
 /* Tabelle */
 table {
@@ -104,6 +90,19 @@ table th {
   font-weight: 600;
 }
 
+/* Celle non valide */
+.cell-non-valida {
+  background-color: #ffe6e6;
+}
+
+/* Input inline nelle celle */
+.table input.form-control-sm {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
 /* Pulsanti */
 button, .btn {
   padding: 0.5rem 1rem;
@@ -118,6 +117,18 @@ button, .btn {
 
 button:hover, .btn:hover {
   background-color: #0056b3;
+}
+
+/* Pulsanti secondari */
+.btn-outline-danger {
+  background-color: transparent;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
 }
 
 /* Input */
@@ -173,13 +184,8 @@ input, select, textarea {
 }
 
 /* Messaggi */
-.text-muted {
-  color: #6c757d;
-}
-
-.text-danger {
-  color: #dc3545;
-}
+.text-muted { color: #6c757d; }
+.text-danger { color: #dc3545; }
 
 /* Badge */
 .badge {
@@ -194,7 +200,7 @@ input, select, textarea {
   margin-bottom: 0.5rem;
 }
 
-/* Responsive */
+/* Responsive stampa */
 @media print {
   .sidebar, .btn, .form-control, .form-select {
     display: none !important;

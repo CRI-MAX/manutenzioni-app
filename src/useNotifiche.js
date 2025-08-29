@@ -6,6 +6,7 @@ import {
   orderBy,
   where,
   limit
+  // onSnapshot // opzionale per realtime
 } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -55,7 +56,7 @@ export const useNotifiche = ({
       });
       setNotifiche(dati);
     } catch (err) {
-      console.error("Errore nel recupero notifiche:", err);
+      console.error("❌ Errore nel recupero notifiche:", err);
       setErrore(err);
     } finally {
       setCaricamento(false);
@@ -64,11 +65,30 @@ export const useNotifiche = ({
 
   useEffect(() => {
     fetchNotifiche();
+
     if (autoRefresh) {
       const interval = setInterval(fetchNotifiche, autoRefresh);
       return () => clearInterval(interval);
     }
+
+    // Realtime opzionale:
+    // const q = buildQuery();
+    // const unsubscribe = onSnapshot(q, (snapshot) => {
+    //   const dati = snapshot.docs.map(doc => ({
+    //     id: doc.id,
+    //     ...doc.data(),
+    //     timestamp: doc.data().timestamp?.toDate?.() || null
+    //   }));
+    //   setNotifiche(dati);
+    // });
+    // return () => unsubscribe();
+
   }, [fetchNotifiche, autoRefresh]);
 
-  return { notifiche, caricamento, errore, refresh: fetchNotifiche };
+  return {
+    notifiche,
+    caricamento,
+    errore,
+    refresh: fetchNotifiche
+  };
 };

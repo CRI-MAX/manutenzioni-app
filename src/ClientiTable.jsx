@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "./firebase";
 import { normalizzaCliente } from "./utils/normalizza";
-import CsvExport from "./CsvExport";
+import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { toast } from "react-toastify";
+
+// ✅ Importa SafeRow e CsvExport
+import { SafeRow } from "./components/CSVImporter";
+import CsvExport from "./CsvExport";
 
 function ClientiTable() {
   const [clienti, setClienti] = useState([]);
@@ -106,13 +109,9 @@ function ClientiTable() {
         </thead>
         <tbody>
           {filtrati.length > 0 ? (
-            filtrati.map((c, i) => (
-              <tr key={i}>
-                <td>{c.ragioneSociale}</td>
-                <td>{c.email}</td>
-                <td>{c.telefono}</td>
-                <td>{c.indirizzo}</td>
-                <td>{c.referente}</td>
+            filtrati.map((c) => (
+              <tr key={c.id}>
+                <SafeRow row={c} />
                 <td className="d-flex gap-2">
                   <button className="btn btn-sm btn-outline-primary" disabled>
                     ✏️ Modifica

@@ -4,6 +4,11 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db, storage } from "./firebase";
 import { toast } from "react-toastify";
 
+/**
+ * Componente per caricare allegati (foto o documenti) su un intervento.
+ * @param {string} interventoId - ID dell'intervento Firestore
+ * @param {Function} onAggiorna - Callback dopo l'upload
+ */
 function AllegatiIntervento({ interventoId, onAggiorna }) {
   const [file, setFile] = useState(null);
 
@@ -19,7 +24,10 @@ function AllegatiIntervento({ interventoId, onAggiorna }) {
     }
 
     const tipo = file.type.startsWith("image/") ? "foto" : "documento";
-    const storageRef = ref(storage, `interventi/${interventoId}/${Date.now()}_${file.name}`);
+    const storageRef = ref(
+      storage,
+      `interventi/${interventoId}/${Date.now()}_${file.name}`
+    );
 
     try {
       await uploadBytes(storageRef, file);

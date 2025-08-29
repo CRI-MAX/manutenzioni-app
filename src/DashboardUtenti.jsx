@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
 import { normalizzaUtente } from "./utils/normalizza";
-import DateDisplay from "./components/DateDisplay"; // ✅ integrato
+import DateDisplay from "./components/DateDisplay";
 
 function DashboardUtenti() {
   const [utenti, setUtenti] = useState([]);
@@ -32,44 +32,45 @@ function DashboardUtenti() {
     .slice(0, 5);
 
   return (
-    <div>
-      <h3>📊 Dashboard Utenti</h3>
+    <div className="container mt-4">
+      <h3 className="mb-4">📊 Dashboard Utenti</h3>
+
       <div className="row mb-4">
         <div className="col">
-          <div className="card p-3 text-center">
+          <div className="card p-3 text-center shadow-sm">
             <h5>Admin</h5>
             <p className="display-6">{totali.admin}</p>
           </div>
         </div>
         <div className="col">
-          <div className="card p-3 text-center">
+          <div className="card p-3 text-center shadow-sm">
             <h5>Tecnici</h5>
             <p className="display-6">{totali.tecnico}</p>
           </div>
         </div>
         <div className="col">
-          <div className="card p-3 text-center">
+          <div className="card p-3 text-center shadow-sm">
             <h5>Clienti</h5>
             <p className="display-6">{totali.cliente}</p>
           </div>
         </div>
         <div className="col">
-          <div className="card p-3 text-center">
+          <div className="card p-3 text-center shadow-sm">
             <h5>Attivi</h5>
             <p className="display-6 text-success">{totali.attivi}</p>
           </div>
         </div>
         <div className="col">
-          <div className="card p-3 text-center">
+          <div className="card p-3 text-center shadow-sm">
             <h5>Disattivi</h5>
             <p className="display-6 text-danger">{totali.disattivi}</p>
           </div>
         </div>
       </div>
 
-      <h5 className="mt-4">🕒 Ultimi utenti registrati</h5>
-      <table className="table table-sm table-bordered">
-        <thead>
+      <h5 className="mt-4 mb-3">🕒 Ultimi utenti registrati</h5>
+      <table className="table table-sm table-bordered table-hover">
+        <thead className="table-light">
           <tr>
             <th>Nome</th>
             <th>Email</th>
@@ -85,7 +86,7 @@ function DashboardUtenti() {
               <td>{u.email}</td>
               <td>{u.ruolo}</td>
               <td>{u.attivo ? "✅" : "⛔"}</td>
-              <td><DateDisplay data={u.dataCreazione} /></td> {/* ✅ blindato */}
+              <td><DateDisplay data={u.dataCreazione} /></td>
             </tr>
           ))}
         </tbody>

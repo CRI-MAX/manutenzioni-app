@@ -3,60 +3,58 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "./firebase";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
+import Alert from "react-bootstrap/Alert";
 
-const RecuperoPassword = () => {
+const RecuperaPassword = () => {
   const [email, setEmail] = useState("");
   const [messaggio, setMessaggio] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [caricamento, setCaricamento] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
     setMessaggio("");
-
-    if (!email.trim()) {
-      setMessaggio("❌ Inserisci un'email valida.");
-      return;
-    }
-
-    setLoading(true);
+    setCaricamento(true);
     try {
-      await sendPasswordResetEmail(auth, email.trim());
-      setMessaggio("📧 Email di recupero inviata con successo!");
+      await sendPasswordResetEmail(auth, email);
+      setMessaggio(`✅ Email di recupero inviata a ${email}`);
+      setEmail("");
     } catch (error) {
-      console.error("Errore nel recupero password:", error);
-      setMessaggio("❌ Errore: email non valida o non registrata.");
+      console.error("Errore invio email:", error);
+      setMessaggio("❌ Impossibile inviare l'email. Controlla l'indirizzo.");
     } finally {
-      setLoading(false);
+      setCaricamento(false);
     }
   };
 
   return (
-    <Container className="login-container" style={{ maxWidth: "400px", marginTop: "40px" }}>
-      <h4 className="mb-3 text-center">🔒 Recupera password</h4>
-      <Form onSubmit={handleSubmit}>
+    <div className="p-4 border rounded bg-light">
+      <h5 className="mb-3">🔐 Recupera Password</h5>
+      <Form onSubmit={handleReset}>
         <Form.Group className="mb-3">
-          <Form.Label>Email registrata</Form.Label>
+          <Form.Label>Inserisci la tua email</Form.Label>
           <Form.Control
             type="email"
-            placeholder="Inserisci la tua email"
+            placeholder="es. mario.rossi@email.it"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            autoFocus
           />
         </Form.Group>
-        <Button type="submit" variant="primary" disabled={loading} className="w-100">
-          {loading ? "Invio in corso..." : "Invia email di recupero"}
+        <Button type="submit" variant="primary" disabled={caricamento}>
+          {caricamento ? "⏳ Invio in corso..." : "Invia email di recupero"}
         </Button>
-        {messaggio && (
-          <div className={`mt-3 text-center fw-semibold ${messaggio.startsWith("❌") ? "text-danger" : "text-success"}`}>
-            {messaggio}
-          </div>
-        )}
       </Form>
-    </Container>
+
+      {messaggio && (
+        <Alert
+          variant={messaggio.startsWith("✅") ? "success" : "danger"}
+          className="mt-3"
+        >
+          {messaggio}
+        </Alert>
+      )}
+    </div>
   );
 };
 
-export default RecuperoPassword;
+export default RecuperaPassword;

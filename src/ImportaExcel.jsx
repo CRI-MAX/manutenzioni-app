@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import * as XLSX from "xlsx";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "./firebase";
@@ -10,6 +10,7 @@ const ImportaExcel = ({ tipo }) => {
   const [file, setFile] = useState(null);
   const [messaggio, setMessaggio] = useState("");
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef();
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -31,31 +32,39 @@ const ImportaExcel = ({ tipo }) => {
 
       const collezione = tipo === "clienti" ? "CLIENTI" : "MEZZI";
 
-      for (const item of dati) {
-        const record =
-          tipo === "clienti"
-            ? {
-                ragioneSociale: item.ragioneSociale || "—",
-                partitaIVA: item.partitaIVA || "—",
-                indirizzo: item.indirizzo || "—",
-                email: item.email || "—",
-                telefono: item.telefono || "—",
-                referente: item.referente || "—",
-                dataCreazione: new Date().toISOString() // ✅ blindato
-              }
-            : {
-                marca: item.marca || "—",
-                modello: item.modello || "—",
-                matricola: item.matricola || "—",
-                clienteId: item.clienteId || "—",
-                dataCreazione: new Date().toISOString() // ✅ blindato
-              };
+      const records = dati.map((item) =>
+        tipo === "clienti"
+          ? {
+              ragioneSociale: item.ragioneSociale || item["Ragione Sociale"] || "—",
+              partitaIVA: item.partitaIVA || item["Partita IVA"] || "—",
+              indirizzo: item.indirizzo || item["Indirizzo"] || "—",
+              email: item.email || item["Email"] || "—",
+              telefono: item.telefono || item["Telefono"] || "—",
+              referente: item.referente || item["Referente"] || "—",
+              dataCreazione: new Date().toISOString()
+            }
+          : {
+              marca: item.marca || item["Marca"] || "—",
+              modello: item.modello || item["Modello"] || "—",
+              matricola: item.matricola || item["Matricola"] || "—",
+              clienteId: item.clienteId || item["Cliente ID"] || "—",
+              dataCreazione: new Date().toISOString()
+            }
+      );
 
+      if (records.length === 0) {
+        setMessaggio("❌ Nessun record valido trovato nel file.");
+        setLoading(false);
+        return;
+      }
+
+      for (const record of records) {
         await addDoc(collection(db, collezione), record);
       }
 
-      setMessaggio(`✅ Importazione completata con successo. (${dati.length} record)`);
+      setMessaggio(`✅ Importazione completata con successo. (${records.length} record)`);
       setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Errore durante l'importazione:", error);
       setMessaggio("❌ Errore durante l'importazione. Controlla il file.");
@@ -70,12 +79,17 @@ const ImportaExcel = ({ tipo }) => {
 
       <Form.Group className="mb-3">
         <Form.Label>Seleziona file Excel (.xlsx)</Form.Label>
-        <Form.Control type="file" accept=".xlsx" onChange={handleFileChange} />
+        <Form.Control
+          type="file"
+          accept=".xlsx"
+          onChange={handleFileChange}
+          ref={fileInputRef}
+        />
         {file && <div className="mt-2 text-muted">📎 File selezionato: {file.name}</div>}
       </Form.Group>
 
       <Button variant="success" onClick={handleImport} disabled={loading}>
-        {loading ? "Importazione in corso..." : "Importa dati"}
+        {loading ? "⏳ Importazione in corso..." : "Importa dati"}
       </Button>
 
       {messaggio && (
