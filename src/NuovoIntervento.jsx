@@ -92,70 +92,73 @@ const NuovoIntervento = ({ onInserimento }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!mezzoId || !tecnico.trim() || !firmaTecnico.trim()) {
-      alert("Compila tutti i campi obbligatori.");
-      return;
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!mezzoId || !tecnico.trim() || !firmaTecnico.trim()) {
+    alert("Compila tutti i campi obbligatori.");
+    return;
+  }
+
+  setLoading(true);
+  let fileURL = "";
+  try {
+    if (file) {
+      const storageRef = ref(storage, `interventi/${Date.now()}_${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      fileURL = await getDownloadURL(snapshot.ref);
     }
 
-    setLoading(true);
-    let fileURL = "";
-    try {
-      if (file) {
-        const storageRef = ref(storage, `interventi/${Date.now()}_${file.name}`);
-        const snapshot = await uploadBytes(storageRef, file);
-        fileURL = await getDownloadURL(snapshot.ref);
-      }
+    const prossimaScadenza = tipo === "Controllo"
+      ? calcolaScadenza(dataIntervento, cadenza)
+      : null;
 
-      await addDoc(collection(db, "INTERVENTI"), {
-        mezzoId,
-        tipo,
-        tecnico: tecnico.trim(),
-        firmaTecnico: firmaTecnico.trim(),
-        urgente,
-        note: note.trim(),
-        stato: "Effettuato",
-        data: Timestamp.fromDate(dataIntervento),
-        prossimaScadenza: calcolaScadenza(dataIntervento, cadenza),
-        allegato: fileURL,
-      });
+    await addDoc(collection(db, "INTERVENTI"), {
+      mezzoId,
+      tipo,
+      tecnico: tecnico.trim(),
+      firmaTecnico: firmaTecnico.trim(),
+      urgente,
+      note: note.trim(),
+      stato: "Effettuato",
+      data: Timestamp.fromDate(dataIntervento),
+      prossimaScadenza,
+      allegato: fileURL,
+    });
 
-      setClienteId("");
-      setMezzoId("");
-      setTipo("Ordinario");
-      setTecnico("");
-      setFirmaTecnico("");
-      setUrgente(false);
-      setNote("");
-      setCadenza("Trimestrale");
-      setFile(null);
-      setDataIntervento(new Date());
+    setClienteId("");
+    setMezzoId("");
+    setTipo("Ordinario");
+    setTecnico("");
+    setFirmaTecnico("");
+    setUrgente(false);
+    setNote("");
+    setCadenza("Trimestrale");
+    setFile(null);
+    setDataIntervento(new Date());
 
-      if (onInserimento) onInserimento();
-    } catch (error) {
-      console.error("Errore nel salvataggio intervento:", error);
-      alert("❌ Errore nel salvataggio. Riprova.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    if (onInserimento) onInserimento();
+  } catch (error) {
+    console.error("Errore nel salvataggio intervento:", error);
+    alert("❌ Errore nel salvataggio. Riprova.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Form onSubmit={handleSubmit} className="mb-4 p-3 border rounded bg-light">
       <h4 className="mb-3">➕ Inserisci nuovo intervento</h4>
 
-      <Form.Group className="mb-2">
-        <Form.Label>Cliente</Form.Label>
-        <Form.Select value={clienteId} onChange={(e) => setClienteId(e.target.value)} required>
-          <option value="">Seleziona cliente</option>
-          {clienti.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.ragioneSociale}
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
+     {tipo === "Controllo" && (
+  <Form.Group className="mb-2">
+    <Form.Label>Cadenza</Form.Label>
+    <Form.Select value={cadenza} onChange={(e) => setCadenza(e.target.value)}>
+      <option>Trimestrale</option>
+      <option>Semestrale</option>
+      <option>Annuale</option>
+    </Form.Select>
+  </Form.Group>
+)}
 
       <Form.Group className="mb-2">
         <Form.Label>Mezzo associato</Form.Label>
