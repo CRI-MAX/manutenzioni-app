@@ -8,9 +8,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const NuovoIntervento = ({ onInserimento }) => {
+  const [clienti, setClienti] = useState([]);
   const [mezzi, setMezzi] = useState([]);
+  const [clienteId, setClienteId] = useState("");
   const [mezzoId, setMezzoId] = useState("");
-  const [clienteNome, setClienteNome] = useState("");
   const [tipo, setTipo] = useState("Ordinario");
   const [tecnico, setTecnico] = useState("");
   const [firmaTecnico, setFirmaTecnico] = useState("");
@@ -22,35 +23,20 @@ const NuovoIntervento = ({ onInserimento }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchMezzi = async () => {
+    const fetchData = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "MEZZI"));
-        setMezzi(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        const clientiSnap = await getDocs(collection(db, "CLIENTI"));
+        const mezziSnap = await getDocs(collection(db, "MEZZI"));
+        setClienti(clientiSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        setMezzi(mezziSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       } catch (error) {
-        console.error("Errore nel caricamento dei mezzi:", error);
+        console.error("Errore nel caricamento dati:", error);
       }
     };
-    fetchMezzi();
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchCliente = async () => {
-      const mezzo = mezzi.find(m => m.id === mezzoId);
-      if (mezzo?.clienteId) {
-        try {
-          const snapshot = await getDocs(collection(db, "CLIENTI"));
-          const clienti = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          const cliente = clienti.find(c => c.id === mezzo.clienteId);
-          setClienteNome(cliente?.ragioneSociale || "—");
-        } catch (error) {
-          console.error("Errore nel caricamento cliente:", error);
-        }
-      } else {
-        setClienteNome("");
-      }
-    };
-    fetchCliente();
-  }, [mezzoId, mezzi]);
+  const mezziFiltrati = mezzi.filter(m => m.clienteId === clienteId);
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -99,6 +85,7 @@ const NuovoIntervento = ({ onInserimento }) => {
         allegato: fileURL,
       });
 
+      setClienteId("");
       setMezzoId("");
       setTipo("Ordinario");
       setTecnico("");
@@ -107,7 +94,6 @@ const NuovoIntervento = ({ onInserimento }) => {
       setNote("");
       setCadenza("Trimestrale");
       setFile(null);
-      setClienteNome("");
       setDataIntervento(new Date());
 
       if (onInserimento) onInserimento();
@@ -124,22 +110,34 @@ const NuovoIntervento = ({ onInserimento }) => {
       <h4 className="mb-3">➕ Inserisci nuovo intervento</h4>
 
       <Form.Group className="mb-2">
-        <Form.Label>Mezzo</Form.Label>
-        <Form.Select value={mezzoId} onChange={(e) => setMezzoId(e.target.value)} required>
-          <option value="">Seleziona mezzo</option>
-          {mezzi.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.modello} ({m.id})
+        <Form.Label>Cliente</Form.Label>
+        <Form.Select value={clienteId} onChange={(e) => setClienteId(e.target.value)} required>
+          <option value="">Seleziona cliente</option>
+          {clienti.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.ragioneSociale}
             </option>
           ))}
         </Form.Select>
       </Form.Group>
 
-      {clienteNome && (
-        <Form.Group className="mb-2">
-          <Form.Label>Cliente associato</Form.Label>
-          <Form.Control value={clienteNome} disabled />
-        </Form.Group>
+      <Form.Group className="mb-2">
+        <Form.Label>Mezzo associato</Form.Label>
+        <Form.Select value={mezzoId} onChange={(e) => setMezzoId(e.target.value)} required>
+          <option value="">Seleziona mezzo</option>
+          {mezziFiltrati.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.modello} ({m.Targa || m.Matricola || m.id})
+            </option>
+          ))}
+          <option value="nuovo">➕ Aggiungi nuovo mezzo</option>
+        </Form.Select>
+      </Form.Group>
+
+      {mezzoId === "nuovo" && (
+        <div className="alert alert-info">
+          🔧 Funzione "Aggiungi nuovo mezzo" in costruzione.
+        </div>
       )}
 
       <Form.Group className="mb-2">
