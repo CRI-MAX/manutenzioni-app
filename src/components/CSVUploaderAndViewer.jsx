@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "./firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { storage, db } from "./firebase";
 import Papa from "papaparse";
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
@@ -12,6 +13,7 @@ const CSVUploaderAndViewer = () => {
   const [filteredRows, setFilteredRows] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const [collectionName, setCollectionName] = useState("IMPORT_CSV");
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
@@ -23,6 +25,19 @@ const CSVUploaderAndViewer = () => {
     }
 
     setFile(selected);
+  };
+
+  const importToFirestore = async (data) => {
+    const colRef = collection(db, collectionName);
+    try {
+      for (const row of data) {
+        await addDoc(colRef, row);
+      }
+      toast.success(`🔥 CSV importato nella collezione "${collectionName}"`);
+    } catch (err) {
+      console.error("Errore importazione:", err);
+      toast.error("❌ Errore durante l'import su Firestore");
+    }
   };
 
   const handleUploadAndParse = async () => {
@@ -48,6 +63,8 @@ const CSVUploaderAndViewer = () => {
       setRows(data);
       setFilteredRows(data);
       toast.success("📄 CSV caricato e visualizzato");
+
+      await importToFirestore(data);
     } catch (error) {
       console.error("Errore CSV:", error);
       toast.error("❌ Errore durante il caricamento o parsing");
@@ -71,10 +88,22 @@ const CSVUploaderAndViewer = () => {
 
   return (
     <div className="mb-4">
-      <h5>📤 Carica e visualizza CSV</h5>
+      <h5>📤 Carica, visualizza e importa CSV</h5>
+
+      <Form.Group className="mb-2">
+        <Form.Label>📁 Collezione Firestore di destinazione</Form.Label>
+        <Form.Control
+          type="text"
+          value={collectionName}
+          onChange={(e) => setCollectionName(e.target.value)}
+          placeholder="Es: CLIENTI, INTERVENTI, IMPORT_CSV..."
+        />
+      </Form.Group>
+
       <input type="file" accept=".csv" onChange={handleFileChange} className="form-control mb-2" />
+
       <button className="btn btn-primary" onClick={handleUploadAndParse} disabled={loading}>
-        {loading ? "Caricamento..." : "📎 Carica e Visualizza"}
+        {loading ? "Caricamento..." : "📎 Carica e Importa"}
       </button>
 
       {rows.length > 0 && (
