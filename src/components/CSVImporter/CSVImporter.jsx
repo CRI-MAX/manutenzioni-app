@@ -120,9 +120,18 @@ const CSVImporter = () => {
         />
       </Form.Group>
 
-      <input type="file" accept=".csv" onChange={handleFileChange} className="form-control mb-2" />
+      <input
+        type="file"
+        accept=".csv"
+        onChange={handleFileChange}
+        className="form-control mb-2"
+      />
 
-      <button className="btn btn-success mb-3" onClick={handleUploadAndParse} disabled={loading}>
+      <button
+        className="btn btn-success mb-3"
+        onClick={handleUploadAndParse}
+        disabled={loading}
+      >
         {loading ? "⏳ Importazione in corso..." : "📎 Carica e Visualizza"}
       </button>
 
@@ -146,17 +155,27 @@ const CSVImporter = () => {
             </thead>
             <tbody>
               {filteredRows.map((row, i) => (
-                <SafeRowEditable key={i} row={row} onUpdate={(r) => handleUpdateRow(i, r)} />
+                <SafeRowEditable
+                  key={i}
+                  row={row}
+                  onUpdate={(r) => handleUpdateRow(i, r)}
+                />
               ))}
             </tbody>
           </Table>
 
           <div className="mt-3">
             <p>⚠️ {invalidCount} righe non valide rilevate</p>
-            <button className="btn btn-outline-danger me-2" onClick={handleExportInvalidRows}>
+            <button
+              className="btn btn-outline-danger me-2"
+              onClick={handleExportInvalidRows}
+            >
               📤 Esporta righe non valide
             </button>
-            <button className="btn btn-primary" onClick={handleImportValidRows}>
+            <button
+              className="btn btn-primary"
+              onClick={handleImportValidRows}
+            >
               ✅ Importa solo righe valide
             </button>
           </div>
@@ -166,4 +185,4 @@ const CSVImporter = () => {
   );
 };
 
-export default
+export default CSVImporter;

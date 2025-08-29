@@ -196,4 +196,8 @@ function DashboardInterventi() {
       ) : (
         <p className="text-muted">🔄 Nessun intervento disponibile al momento.</p>
       )}
-    </Container
+    </Container>
+  );
+}
+
+export default DashboardInterventi;

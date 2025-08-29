@@ -48,7 +48,8 @@ button {
 button:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
-/* Celle non valide */
+}
+
 .cell-non-valida {
   background-color: #ffe6e6;
 }
