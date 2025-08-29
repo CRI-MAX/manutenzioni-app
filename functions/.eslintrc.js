@@ -1,28 +1,41 @@
 module.exports = {
   env: {
-    es6: true,
+    es2020: true,
     node: true,
+    mocha: true
   },
   parserOptions: {
-    "ecmaVersion": 2018,
+    ecmaVersion: 2020,
+    sourceType: "module",
+    project: ["./tsconfig.json", "./tsconfig.eslint.json"]
   },
   extends: [
     "eslint:recommended",
-    "google",
+    "google"
   ],
   rules: {
     "no-restricted-globals": ["error", "name", "length"],
     "prefer-arrow-callback": "error",
-    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
+    "quotes": ["error", "double", { allowTemplateLiterals: true }],
+    "require-jsdoc": "off",
+    "valid-jsdoc": "off",
+    "no-console": "warn"
   },
   overrides: [
     {
-      files: ["**/*.spec.*"],
+      files: ["**/*.spec.*", "**/*.test.*"],
       env: {
-        mocha: true,
+        mocha: true
       },
-      rules: {},
-    },
+      rules: {
+        "no-unused-expressions": "off"
+      }
+    }
   ],
-  globals: {},
+  ignorePatterns: [
+    "node_modules/",
+    "lib/",
+    "dist/"
+  ],
+  globals: {}
 };

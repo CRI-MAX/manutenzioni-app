@@ -22,6 +22,15 @@ const NuovoIntervento = ({ onInserimento }) => {
   const [dataIntervento, setDataIntervento] = useState(new Date());
   const [loading, setLoading] = useState(false);
 
+  const [nuovoMezzo, setNuovoMezzo] = useState({
+    modello: "",
+    marca: "",
+    targa: "",
+    matricola: "",
+    note: ""
+  });
+  const [salvataggioMezzo, setSalvataggioMezzo] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -54,6 +63,33 @@ const NuovoIntervento = ({ onInserimento }) => {
     if (cadenza === "Semestrale") d.setMonth(d.getMonth() + 6);
     if (cadenza === "Annuale") d.setFullYear(d.getFullYear() + 1);
     return Timestamp.fromDate(d);
+  };
+
+  const handleSalvaNuovoMezzo = async () => {
+    if (!clienteId || !nuovoMezzo.modello.trim()) {
+      alert("Compila almeno il modello e seleziona un cliente.");
+      return;
+    }
+
+    setSalvataggioMezzo(true);
+    try {
+      const docRef = await addDoc(collection(db, "MEZZI"), {
+        clienteId,
+        clienteNome: clienti.find(c => c.id === clienteId)?.ragioneSociale || "",
+        ...nuovoMezzo,
+        importatoIl: Timestamp.now()
+      });
+
+      const nuovo = { id: docRef.id, clienteId, ...nuovoMezzo };
+      setMezzi(prev => [...prev, nuovo]);
+      setMezzoId(docRef.id);
+      setNuovoMezzo({ modello: "", marca: "", targa: "", matricola: "", note: "" });
+    } catch (error) {
+      console.error("Errore nel salvataggio mezzo:", error);
+      alert("❌ Errore nel salvataggio del mezzo.");
+    } finally {
+      setSalvataggioMezzo(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -135,8 +171,53 @@ const NuovoIntervento = ({ onInserimento }) => {
       </Form.Group>
 
       {mezzoId === "nuovo" && (
-        <div className="alert alert-info">
-          🔧 Funzione "Aggiungi nuovo mezzo" in costruzione.
+        <div className="border rounded p-3 mb-3 bg-white">
+          <h6>➕ Inserisci nuovo mezzo</h6>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Modello *</Form.Label>
+            <Form.Control
+              value={nuovoMezzo.modello}
+              onChange={(e) => setNuovoMezzo({ ...nuovoMezzo, modello: e.target.value })}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Marca</Form.Label>
+            <Form.Control
+              value={nuovoMezzo.marca}
+              onChange={(e) => setNuovoMezzo({ ...nuovoMezzo, marca: e.target.value })}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Targa</Form.Label>
+            <Form.Control
+              value={nuovoMezzo.targa}
+              onChange={(e) => setNuovoMezzo({ ...nuovoMezzo, targa: e.target.value })}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Matricola</Form.Label>
+            <Form.Control
+              value={nuovoMezzo.matricola}
+              onChange={(e) => setNuovoMezzo({ ...nuovoMezzo, matricola: e.target.value })}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-2">
+            <Form.Label>Note</Form.Label>
+            <Form.Control
+              value={nuovoMezzo.note}
+              onChange={(e) => setNuovoMezzo({ ...nuovoMezzo, note: e.target.value })}
+            />
+          </Form.Group>
+
+                    <Button variant="success" onClick={handleSalvaNuovoMezzo} disabled={salvataggioMezzo}>
+            {salvataggioMezzo ? "Salvataggio..." : "💾 Salva mezzo"}
+          </Button>
         </div>
       )}
 

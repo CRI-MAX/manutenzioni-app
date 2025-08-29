@@ -1,2 +1,16 @@
-node_modules/
-*.local
+# Ambiente
+.env
+.env.*.local
+
+# Log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Build
+/dist
+/build
