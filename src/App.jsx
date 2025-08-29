@@ -23,9 +23,8 @@ import MezziTable from "./MezziTable";
 import DettaglioMezzo from "./DettaglioMezzo";
 import LogoAziendale from "./components/LogoAziendale";
 import DashboardUtenti from "./DashboardUtenti";
+import ProfiloUtente from "./ProfiloUtente"; // ✅ Importato
 import { normalizzaCliente, normalizzaMezzo } from "./utils/normalizza";
-
-// ✅ Importa ImportaFile per upload CSV/XLSX
 import { ImportaFile } from "./components/CSVImporter";
 
 function App() {
@@ -203,6 +202,16 @@ function App() {
                   <LogAttivita />
                 ) : (
                   <h5 className="text-danger">⛔ Accesso riservato agli amministratori</h5>
+                )
+              }
+            />
+            <Route
+              path="/profilo"
+              element={
+                utente ? (
+                  <ProfiloUtente />
+                ) : (
+                  <h5 className="text-muted">🔒 Utente non autenticato</h5>
                 )
               }
             />

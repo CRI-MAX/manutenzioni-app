@@ -45,7 +45,13 @@ function ModificaMezzo({ mezzoId, onClose, onAggiorna }) {
         const dati = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setInterventi(dati);
       } catch (error) {
-        console.error("Errore nel recupero interventi:", error);
+        if (error.code === "failed-precondition") {
+          toast.info("⚠️ Indice Firestore mancante. Crealo dalla console.");
+          console.warn("Indice richiesto da Firestore:", error.message);
+        } else {
+          console.error("Errore nel recupero interventi:", error);
+          toast.error("❌ Errore nel recupero interventi.");
+        }
       }
     };
 
