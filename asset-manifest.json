@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/manutenzioni-app/static/css/main.978c289b.css",
-    "main.js": "/manutenzioni-app/static/js/main.41768012.js",
+    "main.css": "/manutenzioni-app/static/css/main.ffdea666.css",
+    "main.js": "/manutenzioni-app/static/js/main.b1259f5c.js",
     "static/js/239.f1f9e44d.chunk.js": "/manutenzioni-app/static/js/239.f1f9e44d.chunk.js",
     "static/js/977.f2363624.chunk.js": "/manutenzioni-app/static/js/977.f2363624.chunk.js",
-    "static/js/455.45e84797.chunk.js": "/manutenzioni-app/static/js/455.45e84797.chunk.js",
+    "static/js/455.541c9fe3.chunk.js": "/manutenzioni-app/static/js/455.541c9fe3.chunk.js",
     "index.html": "/manutenzioni-app/index.html",
-    "main.978c289b.css.map": "/manutenzioni-app/static/css/main.978c289b.css.map",
-    "main.41768012.js.map": "/manutenzioni-app/static/js/main.41768012.js.map",
+    "main.ffdea666.css.map": "/manutenzioni-app/static/css/main.ffdea666.css.map",
+    "main.b1259f5c.js.map": "/manutenzioni-app/static/js/main.b1259f5c.js.map",
     "239.f1f9e44d.chunk.js.map": "/manutenzioni-app/static/js/239.f1f9e44d.chunk.js.map",
     "977.f2363624.chunk.js.map": "/manutenzioni-app/static/js/977.f2363624.chunk.js.map",
-    "455.45e84797.chunk.js.map": "/manutenzioni-app/static/js/455.45e84797.chunk.js.map"
+    "455.541c9fe3.chunk.js.map": "/manutenzioni-app/static/js/455.541c9fe3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.978c289b.css",
-    "static/js/main.41768012.js"
+    "static/css/main.ffdea666.css",
+    "static/js/main.b1259f5c.js"
   ]
 }

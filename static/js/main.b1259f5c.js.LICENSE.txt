@@ -36,9 +36,9 @@ License: MIT
  * Released under the MIT License
  */
 
-/*! sheetjs (C) 2013-present SheetJS -- http://sheetjs.com */
+/*! decimal.js-light v2.5.1 https://github.com/MikeMcl/decimal.js-light/LICENCE */
 
-/*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
+/*! sheetjs (C) 2013-present SheetJS -- http://sheetjs.com */
 
 /**
           * @license
@@ -489,6 +489,36 @@ License: MIT
  */
 
 /**
+ * @license React
+ * use-sync-external-store-shim.production.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * use-sync-external-store-shim/with-selector.production.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * use-sync-external-store-with-selector.production.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
  * A class to parse color values
  * @author Stoyan Stefanov <sstoo@gmail.com>
  * {@link   http://www.phpied.com/rgb-color-parser-in-javascript/}
@@ -601,4 +631,11 @@ License: MIT
  *    kim3er, mfo, alnorth, Flamenco
  */
 
-//! moment.js
+/** @license React v17.0.2
+ * react-is.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
