@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/manutenzioni-app/static/css/main.e1b03bcb.css",
-    "main.js": "/manutenzioni-app/static/js/main.87e1a680.js",
+    "main.css": "/manutenzioni-app/static/css/main.dfe93407.css",
+    "main.js": "/manutenzioni-app/static/js/main.41d7ef27.js",
     "index.html": "/manutenzioni-app/index.html",
-    "main.e1b03bcb.css.map": "/manutenzioni-app/static/css/main.e1b03bcb.css.map",
-    "main.87e1a680.js.map": "/manutenzioni-app/static/js/main.87e1a680.js.map"
+    "main.dfe93407.css.map": "/manutenzioni-app/static/css/main.dfe93407.css.map",
+    "main.41d7ef27.js.map": "/manutenzioni-app/static/js/main.41d7ef27.js.map"
   },
   "entrypoints": [
-    "static/css/main.e1b03bcb.css",
-    "static/js/main.87e1a680.js"
+    "static/css/main.dfe93407.css",
+    "static/js/main.41d7ef27.js"
   ]
 }
